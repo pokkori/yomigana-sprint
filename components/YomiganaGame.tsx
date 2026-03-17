@@ -106,16 +106,23 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
 
   if (phase === "result") {
     const total = Math.min(idx + 1, questions.length);
-    const shareText = `読み仮名スプリントで${total}問中${score / 100}問正解！スコア${score}点 #読み仮名スプリント\nhttps://yomigana-sprint.vercel.app`;
+    const correctCount = Math.round(score / 100);
+    const shareText = `【読み仮名スプリント】${correctCount}/10問正解！難読漢字クイズに挑戦 → https://yomigana-sprint.vercel.app #難読漢字 #読み仮名 #漢字クイズ`;
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-4">🎊</div>
           <h2 className="text-3xl font-bold mb-2">結果発表！</h2>
           <p className="text-5xl font-bold text-red-600 mb-1">{score}<span className="text-xl">点</span></p>
-          <p className="text-gray-500 mb-6">{total}問中 正解率 {Math.round(score / total)}%</p>
+          <p className="text-gray-500 mb-6">{total}問中 正解率 {Math.round((correctCount / total) * 100)}%</p>
           <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`} target="_blank"
-            className="block w-full bg-black text-white font-bold py-3 rounded-xl mb-3">Xでシェア</a>
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-2 w-full bg-sky-500 hover:bg-sky-400 text-white font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-colors">
+            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+            Xでシェアして自慢する
+          </a>
           <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setPhase("playing"); }}
             className="w-full border-2 border-red-600 text-red-600 font-bold py-3 rounded-xl">もう一度挑戦</button>
         </div>
