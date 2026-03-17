@@ -107,7 +107,11 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   if (phase === "result") {
     const total = Math.min(idx + 1, questions.length);
     const correctCount = Math.round(score / 100);
-    const shareText = `【読み仮名スプリント】${correctCount}/10問正解！難読漢字クイズに挑戦 → https://yomigana-sprint.vercel.app #難読漢字 #読み仮名 #漢字クイズ`;
+    const levelLabel = isPremium ? "プレミアム" : "N5";
+    const baseUrl = "https://yomigana-sprint.vercel.app";
+    const ogUrl = `${baseUrl}/api/og?score=${correctCount}&total=${total}&level=${encodeURIComponent(levelLabel)}`;
+    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解！難読漢字クイズに挑戦 → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
+    const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogUrl)}`;
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
@@ -115,7 +119,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           <h2 className="text-3xl font-bold mb-2">結果発表！</h2>
           <p className="text-5xl font-bold text-red-600 mb-1">{score}<span className="text-xl">点</span></p>
           <p className="text-gray-500 mb-6">{total}問中 正解率 {Math.round((correctCount / total) * 100)}%</p>
-          <a href={`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`} target="_blank"
+          <a href={tweetUrl} target="_blank"
             rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 w-full bg-sky-500 hover:bg-sky-400 text-white font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-colors">
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
