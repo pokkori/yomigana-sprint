@@ -161,7 +161,8 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     const accuracy = Math.round((correctCount / total) * 100);
     const danLevel = getDanLevel(correctCount, total);
     const rankLabel = accuracy >= 90 ? "漢字マスター級！" : accuracy >= 70 ? "なかなかやるね！" : "もっと練習だ！";
-    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解！段位:${danLevel.rank}${danLevel.badge} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
+    const topPercent = accuracy >= 100 ? "上位1%" : accuracy >= 90 ? "上位5%" : accuracy >= 70 ? "上位20%" : accuracy >= 50 ? "上位50%" : "入門者";
+    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解！${topPercent}の漢字力！段位:${danLevel.rank}${danLevel.badge} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogUrl)}`;
     return (
       <div className="min-h-screen flex items-center justify-center px-4"
