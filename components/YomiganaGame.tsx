@@ -7,6 +7,24 @@ import PayjpModal from "./PayjpModal";
 const FREE_LIMIT = 10;
 const STORAGE_KEY = "yomigana_daily";
 
+// ─── ログインストリーク ─────────────────────────────────────────────────────
+
+function getYomiganaStreakData(): { streak: number; lastDate: string } {
+  try {
+    return JSON.parse(localStorage.getItem("yomigana_streak") ?? "{}") ?? { streak: 0, lastDate: "" };
+  } catch { return { streak: 0, lastDate: "" }; }
+}
+
+function updateYomiganaStreak(): { streak: number; isNew: boolean } {
+  const today = new Date().toISOString().slice(0, 10);
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const data = getYomiganaStreakData();
+  if (data.lastDate === today) return { streak: data.streak, isNew: false };
+  const newStreak = data.lastDate === yesterday ? data.streak + 1 : 1;
+  localStorage.setItem("yomigana_streak", JSON.stringify({ streak: newStreak, lastDate: today }));
+  return { streak: newStreak, isNew: true };
+}
+
 function getTodayKey() {
   return new Date().toISOString().slice(0, 10);
 }
@@ -51,8 +69,19 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [showPaywall, setShowPaywall] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
   const [showStreakBanner, setShowStreakBanner] = useState(false);
+  const [loginStreak, setLoginStreak] = useState(0);
+  const [showLoginStreakBanner, setShowLoginStreakBanner] = useState(false);
 
-  useEffect(() => { setDailyCount(getDailyCount()); }, []);
+  useEffect(() => {
+    setDailyCount(getDailyCount());
+    // ログインストリーク更新
+    const { streak: ls, isNew } = updateYomiganaStreak();
+    setLoginStreak(ls);
+    if (isNew && ls >= 2) {
+      setShowLoginStreakBanner(true);
+      setTimeout(() => setShowLoginStreakBanner(false), 3000);
+    }
+  }, []);
 
   const current = questions[idx];
   const shuffledChoices = useState(() => shuffle(current?.choices ?? []))[0];
@@ -172,6 +201,17 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   return (
     <div className="min-h-screen px-4 py-8 relative"
       style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
+
+      {/* ログインストリークバナー */}
+      {showLoginStreakBanner && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+          <div className="px-6 py-3 rounded-2xl font-black text-white text-lg shadow-2xl animate-bounce"
+            style={{ background: "linear-gradient(135deg, #dc2626, #fbbf24)", boxShadow: "0 0 30px rgba(220,38,38,0.7)" }}>
+            🥋 {loginStreak}日連続道場入門！
+          </div>
+        </div>
+      )}
+
       {/* 3連続正解フラッシュバナー */}
       {showStreakBanner && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
@@ -187,7 +227,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
 
       <div className="max-w-lg mx-auto">
         {/* ヘッダー */}
-        <div className="flex justify-between items-center mb-6">
+        <div className="flex justify-between items-center mb-4">
           <span className="text-sm" style={{ color: "#78716c" }}>問題 {idx + 1} / {questions.length}</span>
           <span className="font-black text-lg" style={{ color: "#fca5a5" }}>{score}点</span>
           {streak >= 3 && (
@@ -198,6 +238,13 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           )}
           {streak < 3 && <span className="text-sm" style={{ color: "rgba(120,113,108,0.5)" }}>連続: {streak}</span>}
         </div>
+        {/* ログインストリーク表示 */}
+        {loginStreak >= 2 && (
+          <div className="flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full w-fit mx-auto"
+            style={{ background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.3)" }}>
+            <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>🔥 {loginStreak}日連続道場</span>
+          </div>
+        )}
 
         {/* 進捗バー */}
         <div className="w-full rounded-full h-2 mb-8" style={{ background: "rgba(68,64,60,0.6)" }}>
