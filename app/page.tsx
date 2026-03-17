@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const samples = [
   { kanji: "茨城", reading: "いばらき", level: "地名" },
@@ -11,6 +12,9 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       {/* ヒーロー */}
       <section className="bg-gradient-to-b from-red-600 to-red-500 text-white py-20 px-4 text-center">
+        <div className="flex justify-center mb-4">
+          <Image src="/mascot.png" alt="キャラクター" width={80} height={80} className="rounded-full shadow-lg" />
+        </div>
         <p className="text-sm font-bold tracking-widest mb-3 opacity-80">難読漢字クイズ</p>
         <h1 className="text-4xl md:text-5xl font-bold mb-4 leading-tight">
           読み仮名スプリント
