@@ -110,7 +110,9 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     const levelLabel = isPremium ? "プレミアム" : "N5";
     const baseUrl = "https://yomigana-sprint.vercel.app";
     const ogUrl = `${baseUrl}/api/og?score=${correctCount}&total=${total}&level=${encodeURIComponent(levelLabel)}`;
-    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解！難読漢字クイズに挑戦 → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
+    const accuracy = Math.round((correctCount / total) * 100);
+    const rankLabel = accuracy >= 90 ? "漢字マスター級！" : accuracy >= 70 ? "なかなかやるね！" : "もっと練習だ！";
+    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解(正答率${accuracy}%)！${rankLabel} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogUrl)}`;
     return (
       <div className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center px-4">
@@ -128,7 +130,9 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             Xでシェアして自慢する
           </a>
           <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setPhase("playing"); }}
-            className="w-full border-2 border-red-600 text-red-600 font-bold py-3 rounded-xl">もう一度挑戦</button>
+            className="w-full bg-red-600 text-white font-bold py-4 rounded-xl text-lg active:scale-95 transition-transform shadow-lg">
+            🔄 もう一度挑戦！
+          </button>
         </div>
       </div>
     );
