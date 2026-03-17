@@ -30,6 +30,15 @@ function shuffle<T>(arr: T[]): T[] {
 
 type Phase = "playing" | "answered" | "result" | "paywall";
 
+function getDanLevel(correctCount: number, total: number): { badge: string; rank: string; color: string } {
+  const accuracy = total > 0 ? (correctCount / total) * 100 : 0;
+  if (accuracy >= 100) return { badge: "👑", rank: "名人", color: "#fbbf24" };
+  if (accuracy >= 90) return { badge: "⚔️", rank: "五段", color: "#f97316" };
+  if (accuracy >= 70) return { badge: "⚔️", rank: "三段", color: "#ef4444" };
+  if (accuracy >= 50) return { badge: "🥋", rank: "初段", color: "#a78bfa" };
+  return { badge: "📖", rank: "見習い", color: "#78716c" };
+}
+
 export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const allQuestions = isPremium ? shuffle([...freeQuestions, ...premiumQuestions]) : shuffle(freeQuestions);
   const [questions] = useState<Question[]>(allQuestions);
@@ -41,6 +50,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [dailyCount, setDailyCount] = useState(0);
+  const [showStreakBanner, setShowStreakBanner] = useState(false);
 
   useEffect(() => { setDailyCount(getDailyCount()); }, []);
 
@@ -54,8 +64,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     setIsCorrect(correct);
     setPhase("answered");
     if (correct) {
+      const newStreak = streak + 1;
       setScore(s => s + 100 + streak * 10);
-      setStreak(s => s + 1);
+      setStreak(newStreak);
+      // 3連続以上でフラッシュバナー
+      if (newStreak >= 3) {
+        setShowStreakBanner(true);
+        setTimeout(() => setShowStreakBanner(false), 1500);
+      }
     } else {
       setStreak(0);
     }
@@ -80,25 +96,28 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
 
   if (phase === "paywall" || showPaywall) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         {showPaywall && <PayjpModal onClose={() => setShowPaywall(false)} />}
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-4">📚</div>
-          <h2 className="text-2xl font-bold mb-2">本日の無料問題が終了しました</h2>
-          <p className="text-gray-500 mb-6">プレミアムで全3,000問に挑戦しよう！</p>
-          <div className="bg-white rounded-2xl shadow-lg p-6 mb-4">
-            <p className="text-3xl font-bold text-red-600 mb-1">¥480<span className="text-base font-normal text-gray-500">/月</span></p>
-            <ul className="text-sm text-gray-600 text-left space-y-2 mt-4">
+          <h2 className="text-2xl font-black mb-2" style={{ color: "#e7e5e4" }}>本日の無料問題が終了しました</h2>
+          <p className="mb-6" style={{ color: "#78716c" }}>プレミアムで全3,000問に挑戦しよう！</p>
+          <div className="rounded-2xl p-6 mb-4"
+            style={{ background: "rgba(68,64,60,0.5)", border: "1px solid rgba(220,38,38,0.3)" }}>
+            <p className="text-3xl font-black mb-1" style={{ color: "#fca5a5" }}>¥480<span className="text-base font-normal" style={{ color: "#78716c" }}>/月</span></p>
+            <ul className="text-sm text-left space-y-2 mt-4" style={{ color: "#a8a29e" }}>
               <li>✓ 全3,000問（地名・人名・難読・JLPT N1〜N5）</li>
               <li>✓ 毎日無制限でプレイ</li>
               <li>✓ ランキング機能</li>
             </ul>
           </div>
           <button onClick={() => setShowPaywall(true)}
-            className="w-full bg-red-600 text-white font-bold py-4 rounded-xl text-lg">
-            プレミアムで続ける →
+            className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform"
+            style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+            🥋 プレミアムで道場を続ける →
           </button>
-          <p className="text-xs text-gray-400 mt-3">明日また10問無料でプレイできます</p>
+          <p className="text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>明日また10問無料でプレイできます</p>
         </div>
       </div>
     );
@@ -111,27 +130,37 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     const baseUrl = "https://yomigana-sprint.vercel.app";
     const ogUrl = `${baseUrl}/api/og?score=${correctCount}&total=${total}&level=${encodeURIComponent(levelLabel)}`;
     const accuracy = Math.round((correctCount / total) * 100);
+    const danLevel = getDanLevel(correctCount, total);
     const rankLabel = accuracy >= 90 ? "漢字マスター級！" : accuracy >= 70 ? "なかなかやるね！" : "もっと練習だ！";
-    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解(正答率${accuracy}%)！${rankLabel} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
+    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解！段位:${danLevel.rank}${danLevel.badge} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogUrl)}`;
     return (
-      <div className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4"
+        style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         <div className="max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🎊</div>
-          <h2 className="text-3xl font-bold mb-2">結果発表！</h2>
-          <p className="text-5xl font-bold text-red-600 mb-1">{score}<span className="text-xl">点</span></p>
-          <p className="text-gray-500 mb-6">{total}問中 正解率 {Math.round((correctCount / total) * 100)}%</p>
+          {/* 段位バッジ */}
+          <div className="text-7xl mb-2">{danLevel.badge}</div>
+          <div className="inline-block px-5 py-2 rounded-full font-black text-xl mb-4"
+            style={{ background: "rgba(220,38,38,0.2)", color: danLevel.color, border: `1px solid ${danLevel.color}` }}>
+            {danLevel.rank}
+          </div>
+          <h2 className="text-2xl font-black mb-2" style={{ color: "#e7e5e4" }}>結果発表！</h2>
+          <p className="text-5xl font-black mb-1" style={{ color: "#fca5a5" }}>{score}<span className="text-xl" style={{ color: "#a8a29e" }}>点</span></p>
+          <p className="mb-2" style={{ color: "#78716c" }}>{total}問中 {correctCount}問正解 / 正解率{accuracy}%</p>
+          <p className="text-sm font-bold mb-6" style={{ color: danLevel.color }}>{rankLabel}</p>
           <a href={tweetUrl} target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full bg-sky-500 hover:bg-sky-400 text-white font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-colors">
+            className="flex items-center justify-center gap-2 w-full font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-all active:scale-95"
+            style={{ background: "#000", color: "#fff" }}>
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
-            Xでシェアして自慢する
+            {danLevel.rank}をXで自慢する {danLevel.badge}
           </a>
-          <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setPhase("playing"); }}
-            className="w-full bg-red-600 text-white font-bold py-4 rounded-xl text-lg active:scale-95 transition-transform shadow-lg">
-            🔄 もう一度挑戦！
+          <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setPhase("playing"); setShowStreakBanner(false); }}
+            className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg"
+            style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+            🥋 もう一度挑戦！
           </button>
         </div>
       </div>
@@ -141,42 +170,71 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const choicesToShow = shuffle(current.choices);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-red-50 to-white px-4 py-8">
+    <div className="min-h-screen px-4 py-8 relative"
+      style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
+      {/* 3連続正解フラッシュバナー */}
+      {showStreakBanner && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
+          <div className="px-8 py-3 rounded-2xl font-black text-white text-xl animate-ping"
+            style={{
+              background: "linear-gradient(135deg, #dc2626, #ef4444)",
+              boxShadow: "0 0 40px rgba(220,38,38,0.8)",
+            }}>
+            🔥 {streak}連続正解！
+          </div>
+        </div>
+      )}
+
       <div className="max-w-lg mx-auto">
         {/* ヘッダー */}
         <div className="flex justify-between items-center mb-6">
-          <span className="text-sm text-gray-500">問題 {idx + 1} / {questions.length}</span>
-          <span className="font-bold text-red-600">{score}点</span>
-          {streak >= 3 && <span className="text-orange-500 text-sm font-bold">{streak}連続正解！</span>}
+          <span className="text-sm" style={{ color: "#78716c" }}>問題 {idx + 1} / {questions.length}</span>
+          <span className="font-black text-lg" style={{ color: "#fca5a5" }}>{score}点</span>
+          {streak >= 3 && (
+            <span className="text-sm font-black px-2 py-1 rounded-full"
+              style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5" }}>
+              🔥 {streak}連続
+            </span>
+          )}
+          {streak < 3 && <span className="text-sm" style={{ color: "rgba(120,113,108,0.5)" }}>連続: {streak}</span>}
         </div>
 
         {/* 進捗バー */}
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-8">
-          <div className="bg-red-500 h-2 rounded-full transition-all"
-            style={{ width: `${((idx) / questions.length) * 100}%` }} />
+        <div className="w-full rounded-full h-2 mb-8" style={{ background: "rgba(68,64,60,0.6)" }}>
+          <div className="h-2 rounded-full transition-all"
+            style={{ width: `${((idx) / questions.length) * 100}%`, background: "linear-gradient(90deg, #dc2626, #ef4444)" }} />
         </div>
 
         {/* 問題 */}
         <div className="text-center mb-8 animate-fade-in">
-          <p className="text-xs text-gray-400 mb-2 uppercase tracking-widest">{current.level}</p>
-          <p className="text-7xl font-bold mb-3">{current.kanji}</p>
-          {current.hint && <p className="text-sm text-gray-400">ヒント: {current.hint}</p>}
+          <p className="text-xs mb-2 uppercase tracking-widest" style={{ color: "rgba(220,38,38,0.7)" }}>{current.level}</p>
+          <p className="text-7xl font-black mb-3" style={{ color: "#fff", textShadow: "0 0 20px rgba(255,255,255,0.1)" }}>{current.kanji}</p>
+          {current.hint && <p className="text-sm" style={{ color: "#78716c" }}>ヒント: {current.hint}</p>}
         </div>
 
         {/* 選択肢 */}
         <div className="grid grid-cols-2 gap-3">
           {choicesToShow.map(choice => {
-            let cls = "p-4 rounded-xl text-lg font-bold border-2 transition-all ";
+            let style: React.CSSProperties = {};
+            let cls = "p-4 rounded-xl text-lg font-black border-2 transition-all ";
             if (phase === "answered") {
-              if (choice === current.correct) cls += "bg-green-100 border-green-500 text-green-700";
-              else if (choice === selected) cls += "bg-red-100 border-red-500 text-red-700";
-              else cls += "bg-gray-50 border-gray-200 text-gray-400";
+              if (choice === current.correct) {
+                cls += "border-green-500";
+                style = { background: "rgba(34,197,94,0.2)", color: "#86efac" };
+              } else if (choice === selected) {
+                cls += "border-red-500";
+                style = { background: "rgba(220,38,38,0.2)", color: "#fca5a5" };
+              } else {
+                cls += "border-transparent";
+                style = { background: "rgba(68,64,60,0.3)", color: "rgba(120,113,108,0.5)" };
+              }
             } else {
-              cls += "bg-white border-gray-200 hover:border-red-400 hover:bg-red-50 active:scale-95 cursor-pointer";
+              cls += "cursor-pointer active:scale-95";
+              style = { background: "rgba(68,64,60,0.5)", color: "#e7e5e4", border: "2px solid rgba(120,113,108,0.4)" };
             }
             return (
               <button key={choice} onClick={() => handleAnswer(choice)} disabled={phase === "answered"}
-                className={cls}>
+                className={cls} style={style}>
                 {choice}
               </button>
             );
@@ -185,7 +243,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
 
         {/* 無料残り表示 */}
         {!isPremium && (
-          <p className="text-center text-xs text-gray-400 mt-8">
+          <p className="text-center text-xs mt-8" style={{ color: "rgba(120,113,108,0.5)" }}>
             本日の無料問題: {FREE_LIMIT - dailyCount}問残り
           </p>
         )}
