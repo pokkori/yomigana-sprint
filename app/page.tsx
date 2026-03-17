@@ -74,6 +74,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* SNSシェア訴求 */}
+      <section className="py-12 px-4 bg-red-600 text-white text-center">
+        <h2 className="text-xl font-bold mb-2">友達は何問読める？</h2>
+        <p className="text-red-200 text-sm mb-6">結果をXでシェアして漢字力を自慢しよう</p>
+        <div className="bg-white/10 rounded-2xl p-4 max-w-sm mx-auto mb-6">
+          <p className="text-white font-bold mb-1 text-sm">投稿イメージ</p>
+          <p className="text-red-100 text-xs leading-relaxed">
+            「【読み仮名スプリント】10問中8問正解！<br />
+            薔薇・茨城・山葵…全部読める？<br />
+            → yomigana-sprint.vercel.app #難読漢字 #漢字クイズ」
+          </p>
+        </div>
+        <Link href="/game"
+          className="inline-block bg-white text-red-600 font-bold text-lg px-10 py-4 rounded-2xl shadow hover:scale-105 transition-transform">
+          挑戦してシェアする →
+        </Link>
+      </section>
+
       {/* CTA */}
       <section className="py-16 px-4 text-center">
         <h2 className="text-2xl font-bold mb-4">まず無料で試してみよう</h2>
@@ -84,7 +102,12 @@ export default function HomePage() {
       </section>
 
       <footer className="text-center text-xs text-gray-400 pb-8">
-        © 2026 ポッコリラボ
+        <p>© 2026 ポッコリラボ</p>
+        <p className="mt-1">
+          <a href="/legal" className="underline hover:text-gray-600">特定商取引法</a>
+          {" · "}
+          <a href="/privacy" className="underline hover:text-gray-600">プライバシーポリシー</a>
+        </p>
       </footer>
     </div>
   );
