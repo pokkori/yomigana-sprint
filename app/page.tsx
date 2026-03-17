@@ -156,10 +156,13 @@ export default function HomePage() {
 
       <footer className="text-center text-xs pb-8" style={{ color: "rgba(120,113,108,0.6)" }}>
         <p>© 2026 ポッコリラボ</p>
-        <p className="mt-1">
+        <div className="flex justify-center gap-4 mt-1">
           <a href="/legal" className="underline hover:opacity-70">特定商取引法</a>
-          {" · "}
           <a href="/privacy" className="underline hover:opacity-70">プライバシーポリシー</a>
+          <a href="/terms" className="underline hover:opacity-70">利用規約</a>
+        </div>
+        <p className="mt-1">
+          <a href="https://twitter.com/levona_design" className="underline hover:opacity-70">お問い合わせ: X @levona_design</a>
         </p>
       </footer>
     </div>
