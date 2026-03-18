@@ -200,6 +200,27 @@ export default function HomePage() {
         </a>
       </section>
 
+      {/* もっと楽しむ3選 */}
+      <section className="max-w-lg mx-auto px-4 py-8">
+        <h2 className="text-center text-base font-bold mb-4" style={{ color: "#ef4444" }}>📚 もっと楽しむ3選</h2>
+        <ol className="space-y-3">
+          {[
+            { icon: "🥇", title: "全難易度をクリアしよう", desc: "易・普通・難・超難の4段階を制覇してJLPT N1レベルの難読漢字を完全習得！" },
+            { icon: "📣", title: "スコアをXでシェア", desc: "ゲームクリア後にXでスコア投稿。「難読漢字オタク認定」をもらおう！" },
+            { icon: "📖", title: "毎日1ステージの脳トレ習慣", desc: "朝5分の漢字スプリントで記憶力・語彙力が着実にアップ。" },
+          ].map((item, i) => (
+            <li key={i} className="flex items-start gap-3"
+              style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "12px", padding: "12px 14px" }}>
+              <span style={{ fontSize: "22px", lineHeight: "1" }}>{item.icon}</span>
+              <div>
+                <div style={{ color: "#b91c1c", fontWeight: "700", fontSize: "13px" }}>{i + 1}. {item.title}</div>
+                <div style={{ color: "rgba(120,60,60,0.8)", fontSize: "12px", marginTop: "2px" }}>{item.desc}</div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </section>
+
       <footer className="text-center text-xs pb-8" style={{ color: "rgba(120,113,108,0.6)" }}>
         <p>© 2026 ポッコリラボ</p>
         <div className="flex justify-center gap-4 mt-1">
