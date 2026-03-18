@@ -154,6 +154,30 @@ export default function HomePage() {
         </Link>
       </section>
 
+      {/* FAQ */}
+      <section className="py-10 px-4 max-w-lg mx-auto">
+        <h2 className="text-center text-lg font-bold mb-5" style={{ color: "#fca5a5" }}>よくある質問</h2>
+        <div className="space-y-3">
+          {[
+            { q: "どんな問題が出ますか？", a: "難読漢字・都道府県地名・人名・動植物名など全3,000問以上。N1〜N5レベルから日常語まで幅広くカバーしています。" },
+            { q: "段位はどう上がりますか？", a: "連続正解するごとに段位が上昇します。10問チャレンジで全問正解すると一気に昇段！最高位「名人」を目指してください。" },
+            { q: "スコアは記録されますか？", a: "ブラウザのローカルストレージにハイスコアと段位が保存されます。同じデバイスであればいつでも確認できます。" },
+            { q: "料金はかかりますか？", a: "基本プレイは無料です。月額¥480のプレミアムプランで全問題・ランキング機能・無制限チャレンジが使えます。" },
+          ].map((faq, i) => (
+            <div key={i} style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", borderRadius: "12px", padding: "14px 16px" }}>
+              <p style={{ color: "#fca5a5", fontWeight: "600", fontSize: "13px", marginBottom: "6px" }}>Q. {faq.q}</p>
+              <p style={{ color: "rgba(252,165,165,0.7)", fontSize: "12px" }}>A. {faq.a}</p>
+            </div>
+          ))}
+        </div>
+        <a href="https://twitter.com/intent/tweet?text=%E8%AA%AD%E3%81%BF%E4%BB%AE%E5%90%8D%E3%82%B9%E3%83%97%E3%83%AA%E3%83%B3%E3%83%88%E3%81%A7%E9%9B%A3%E8%AA%AD%E6%BC%A2%E5%AD%97%E3%81%AB%E6%8C%91%E6%88%A6%E3%81%97%E3%81%9F%EF%BC%81%F0%9F%A5%8B%20%23%E8%AA%AD%E3%81%BF%E4%BB%AE%E5%90%8D%20%23%E9%9B%A3%E8%AA%AD%E6%BC%A2%E5%AD%97%20https%3A%2F%2Fyomigana-sprint.vercel.app" target="_blank" rel="noopener noreferrer"
+          className="mt-5 flex items-center justify-center gap-2 text-sm font-bold py-2.5 px-6 rounded-xl transition-colors w-full"
+          style={{ background: "#18181b", color: "#fff", marginTop: "20px" }}>
+          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          結果をXでシェア
+        </a>
+      </section>
+
       <footer className="text-center text-xs pb-8" style={{ color: "rgba(120,113,108,0.6)" }}>
         <p>© 2026 ポッコリラボ</p>
         <div className="flex justify-center gap-4 mt-1">
