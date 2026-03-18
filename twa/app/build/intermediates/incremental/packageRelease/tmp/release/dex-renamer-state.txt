@@ -1,0 +1,4 @@
+#Wed Mar 18 22:54:02 JST 2026
+base.0=D\:\\99_Webアプリ\\読み仮名スプリント\\twa\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+path.0=classes.dex
+renamed.0=classes.dex
