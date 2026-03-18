@@ -1,0 +1,16 @@
+{
+  "name": "読み仮名スプリント",
+  "short_name": "読み仮名",
+  "description": "漢字の読み仮名をどれだけ速く答えられるか！スピード漢字読みゲーム。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0c1a2e",
+  "theme_color": "#0ea5e9",
+  "orientation": "portrait",
+  "lang": "ja",
+  "icons": [
+    {"src":"/icons/icon-192x192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"/icons/icon-512x512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+  ]
+}
