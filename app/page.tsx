@@ -108,6 +108,7 @@ export default function HomePage() {
             <div className="rounded-2xl p-6"
               style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.3), rgba(153,27,27,0.3))", border: "2px solid rgba(220,38,38,0.5)" }}>
               <p className="font-black text-base mb-1" style={{ color: "#fca5a5" }}>プレミアム</p>
+              <div style={{ display: "inline-block", background: "#16a34a", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "2px 10px", borderRadius: "999px", marginBottom: "8px" }}>🛡️ 30日返金保証</div>
               <p className="text-3xl font-black mb-4" style={{ color: "#fff" }}>¥480<span className="text-sm font-normal" style={{ color: "#fca5a5" }}>/月</span></p>
               <ul className="text-sm space-y-2" style={{ color: "#fcd5d5" }}>
                 <li>✓ 全3,000問</li>
