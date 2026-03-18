@@ -154,6 +154,27 @@ export default function HomePage() {
         </Link>
       </section>
 
+      {/* 感情フック */}
+      <section className="py-12 px-6 max-w-3xl mx-auto">
+        <h2 className="text-xl font-bold text-center text-gray-800 mb-6">こんな経験ありませんか？</h2>
+        <div className="space-y-4">
+          {[
+            { icon: "😓", text: "小学生の漢字読みが苦手で、テストのたびに落ち込む..." },
+            { icon: "😤", text: "市販のドリルは退屈で、すぐ飽きてしまう..." },
+            { icon: "💭", text: "楽しく練習できる方法があれば、もっと続けられるのに..." },
+          ].map((item, i) => (
+            <div key={i} className="flex items-center gap-4 bg-red-50 border border-red-200 rounded-xl p-4">
+              <span className="text-2xl">{item.icon}</span>
+              <p className="text-gray-700 text-sm font-medium">{item.text}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-6 bg-red-600 text-white rounded-2xl p-5 text-center">
+          <p className="font-bold text-base mb-1">読み仮名スプリントがその悩みを解決します</p>
+          <p className="text-red-100 text-sm">ゲーム感覚でスピード練習。楽しいから自然と続けられます。</p>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-10 px-4 max-w-lg mx-auto">
         <h2 className="text-center text-lg font-bold mb-5" style={{ color: "#fca5a5" }}>よくある質問</h2>
