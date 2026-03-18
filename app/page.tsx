@@ -200,6 +200,26 @@ export default function HomePage() {
         </a>
       </section>
 
+      {/* ハンドメイドチャンネル アフィリエイト */}
+      <section className="max-w-lg mx-auto px-4 pb-6">
+        <div style={{ background: "rgba(6,78,59,0.3)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: "16px", padding: "16px" }}>
+          <p style={{ color: "#6ee7b7", fontWeight: "700", fontSize: "14px", marginBottom: "12px" }}>📚 日本語・国語が好きなら、日本文化を仕事に</p>
+          <a
+            href="https://px.a8.net/svt/ejp?a8mat=4AZIOF+8PRGKY+4V0U+BXB8Z"
+            target="_blank"
+            rel="noopener noreferrer sponsored"
+            style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(6,78,59,0.4)", border: "1px solid rgba(16,185,129,0.3)", borderRadius: "12px", padding: "12px 14px", textDecoration: "none" }}
+          >
+            <div>
+              <div style={{ color: "#ecfdf5", fontWeight: "700", fontSize: "13px" }}>ハンドメイドチャンネル — 日本文化・和雑貨で副業</div>
+              <div style={{ color: "rgba(110,231,183,0.65)", fontSize: "11px", marginTop: "2px" }}>¥5,000〜¥15,000 報酬 • 和文化・手芸・クラフトを仕事に</div>
+            </div>
+            <span style={{ color: "#6ee7b7", fontWeight: "700", fontSize: "11px", background: "rgba(6,78,59,0.5)", border: "1px solid rgba(16,185,129,0.4)", padding: "4px 8px", borderRadius: "999px", whiteSpace: "nowrap", marginLeft: "8px" }}>詳細を見る →</span>
+          </a>
+          <p style={{ color: "rgba(52,211,153,0.45)", fontSize: "11px", textAlign: "center", marginTop: "8px" }}>※ 広告・PR掲載</p>
+        </div>
+      </section>
+
       {/* もっと楽しむ3選 */}
       <section className="max-w-lg mx-auto px-4 py-8">
         <h2 className="text-center text-base font-bold mb-4" style={{ color: "#ef4444" }}>📚 もっと楽しむ3選</h2>
