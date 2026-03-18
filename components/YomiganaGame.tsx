@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
-import PayjpModal from "./PayjpModal";
+import KomojuButton from "./KomojuButton";
 
 const FREE_LIMIT = 10;
 const STORAGE_KEY = "yomigana_daily";
@@ -127,7 +127,6 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
-        {showPaywall && <PayjpModal onClose={() => setShowPaywall(false)} />}
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-4">📚</div>
           <h2 className="text-2xl font-black mb-2" style={{ color: "#e7e5e4" }}>本日の無料問題が終了しました</h2>
@@ -141,11 +140,11 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               <li>✓ ランキング機能</li>
             </ul>
           </div>
-          <button onClick={() => setShowPaywall(true)}
-            className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform"
-            style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
-            🥋 プレミアムで道場を続ける →
-          </button>
+          <KomojuButton
+            planId="standard"
+            planLabel="🥋 プレミアムで道場を続ける →"
+            className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform disabled:opacity-50 bg-red-700 hover:bg-red-800 text-white"
+          />
           <p className="text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>明日また10問無料でプレイできます</p>
         </div>
       </div>
