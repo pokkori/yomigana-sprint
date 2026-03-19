@@ -8,6 +8,35 @@ const FREE_LIMIT = 10;
 const STORAGE_KEY = "yomigana_daily";
 const TA_BEST_KEY = "yomigana_ta_best";
 const DIFFICULTY_KEY = "yomigana_difficulty";
+const WEAK_LIST_KEY = "yomigana_weak_list";
+
+// ─── 苦手リスト管理 ──────────────────────────────────────────────────────────
+type WeakItem = { kanji: string; correct: string; level: string; missCount: number };
+
+function getWeakList(): WeakItem[] {
+  try { return JSON.parse(localStorage.getItem(WEAK_LIST_KEY) ?? "[]"); } catch { return []; }
+}
+
+function addToWeakList(q: Question) {
+  try {
+    const list = getWeakList();
+    const idx = list.findIndex(w => w.kanji === q.kanji);
+    if (idx >= 0) {
+      list[idx].missCount += 1;
+    } else {
+      list.unshift({ kanji: q.kanji, correct: q.correct, level: q.level, missCount: 1 });
+    }
+    // 最大100件
+    localStorage.setItem(WEAK_LIST_KEY, JSON.stringify(list.slice(0, 100)));
+  } catch { /* noop */ }
+}
+
+function removeFromWeakList(kanji: string) {
+  try {
+    const list = getWeakList().filter(w => w.kanji !== kanji);
+    localStorage.setItem(WEAK_LIST_KEY, JSON.stringify(list));
+  } catch { /* noop */ }
+}
 
 type Difficulty = "easy" | "normal" | "hard";
 
@@ -123,6 +152,9 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [taNewRecord, setTaNewRecord] = useState(false);
   const [diffBest, setDiffBest] = useState(0);
   const [diffNewRecord, setDiffNewRecord] = useState(false);
+  const [wrongQuestions, setWrongQuestions] = useState<Question[]>([]);
+  const [weakList, setWeakList] = useState<WeakItem[]>([]);
+  const [resultTab, setResultTab] = useState<"result" | "weak">("result");
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -131,6 +163,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     const savedDiff = getSavedDifficulty();
     setDifficulty(savedDiff);
     setDiffBest(getDiffBest(savedDiff));
+    setWeakList(getWeakList());
     // ログインストリーク更新
     const { streak: ls, isNew } = updateYomiganaStreak();
     setLoginStreak(ls);
@@ -192,6 +225,13 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       }
     } else {
       setStreak(0);
+      // 間違えた問題を記録
+      setWrongQuestions(prev => {
+        if (prev.find(q => q.kanji === current.kanji)) return prev;
+        return [...prev, current];
+      });
+      addToWeakList(current);
+      setWeakList(getWeakList());
     }
 
     const delay = gameMode === "timeattack" ? 600 : 1000;
@@ -399,12 +439,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     const isNewDiffRecord = saveDiffBest(difficulty, correctCount);
     if (isNewDiffRecord && !diffNewRecord) setDiffNewRecord(true);
     const currentDiffBest = getDiffBest(difficulty);
-    const shareText = `【読み仮名スプリント】${diffCfg.emoji}${diffCfg.label} ${correctCount}/${total}問正解！${topPercent}の漢字力！段位:${danLevel.rank}${danLevel.badge} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
+    const missCount = wrongQuestions.length;
+    const weakListAll = weakList;
+    const shareText = `【読み仮名スプリント】${diffCfg.emoji}${diffCfg.label} ${correctCount}/${total}問正解！${topPercent}の漢字力！段位:${danLevel.rank}${danLevel.badge}${missCount > 0 ? ` (苦手${missCount}問を克服中)` : " 全問正解！"} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogUrl)}`;
     return (
-      <div className="min-h-screen flex items-center justify-center px-4"
+      <div className="min-h-screen px-4 py-8"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
-        <div className="max-w-md w-full text-center">
+        <div className="max-w-md mx-auto text-center">
           {/* 段位バッジ */}
           <div className="text-7xl mb-2">{danLevel.badge}</div>
           <div className="inline-block px-5 py-2 rounded-full font-black text-xl mb-2"
@@ -426,21 +468,116 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           ) : (
             <p className="text-xs mb-1" style={{ color: "#78716c" }}>🏆 [{diffCfg.label}] 最高: {currentDiffBest}問</p>
           )}
-          <p className="text-sm font-bold mb-6" style={{ color: danLevel.color }}>{rankLabel}</p>
-          <a href={tweetUrl} target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 w-full font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-all active:scale-95"
-            style={{ background: "#000", color: "#fff" }}>
-            <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-            </svg>
-            {danLevel.rank}をXで自慢する {danLevel.badge}
-          </a>
-          <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setPhase("mode_select"); setShowStreakBanner(false); }}
-            className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg"
-            style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
-            🥋 もう一度挑戦！
-          </button>
+          <p className="text-sm font-bold mb-4" style={{ color: danLevel.color }}>{rankLabel}</p>
+
+          {/* タブ切り替え */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setResultTab("result")}
+              className="flex-1 py-2 rounded-xl text-sm font-black transition-all"
+              style={resultTab === "result"
+                ? { background: "rgba(220,38,38,0.35)", color: "#fca5a5", border: "2px solid rgba(220,38,38,0.7)" }
+                : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "2px solid rgba(68,64,60,0.6)" }}
+            >
+              📊 結果
+            </button>
+            <button
+              onClick={() => setResultTab("weak")}
+              className="flex-1 py-2 rounded-xl text-sm font-black transition-all relative"
+              style={resultTab === "weak"
+                ? { background: "rgba(220,38,38,0.35)", color: "#fca5a5", border: "2px solid rgba(220,38,38,0.7)" }
+                : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "2px solid rgba(68,64,60,0.6)" }}
+            >
+              📖 苦手克服
+              {weakListAll.length > 0 && (
+                <span className="absolute -top-1 -right-1 text-xs font-black px-1.5 py-0.5 rounded-full"
+                  style={{ background: "#dc2626", color: "#fff", minWidth: "20px" }}>
+                  {weakListAll.length}
+                </span>
+              )}
+            </button>
+          </div>
+
+          {resultTab === "result" ? (
+            <>
+              {/* 今回の間違い */}
+              {wrongQuestions.length > 0 && (
+                <div className="rounded-2xl p-4 mb-4 text-left"
+                  style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
+                  <p className="text-xs font-black mb-2" style={{ color: "#fca5a5" }}>今回間違えた {wrongQuestions.length}問 — 苦手リストに追加済み</p>
+                  <div className="space-y-1.5">
+                    {wrongQuestions.map(q => (
+                      <div key={q.kanji} className="flex items-center justify-between px-3 py-1.5 rounded-lg"
+                        style={{ background: "rgba(68,64,60,0.5)" }}>
+                        <span className="text-lg font-black" style={{ color: "#fff" }}>{q.kanji}</span>
+                        <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>{q.correct}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <a href={tweetUrl} target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 w-full font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-all active:scale-95"
+                style={{ background: "#000", color: "#fff" }}>
+                <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                </svg>
+                {danLevel.rank}をXで自慢する {danLevel.badge}
+              </a>
+              <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
+                className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg"
+                style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+                🥋 もう一度挑戦！
+              </button>
+            </>
+          ) : (
+            /* 苦手克服タブ */
+            <div className="text-left">
+              {weakListAll.length === 0 ? (
+                <div className="text-center py-8" style={{ color: "#78716c" }}>
+                  <div className="text-4xl mb-3">🎉</div>
+                  <p className="font-black" style={{ color: "#fca5a5" }}>苦手リストが空です！</p>
+                  <p className="text-sm mt-1">まだ間違えていません。このまま続けよう！</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-xs font-bold mb-3" style={{ color: "rgba(252,165,165,0.6)" }}>
+                    累計 {weakListAll.length}問の苦手漢字 — 何度も復習して克服しよう！
+                  </p>
+                  <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                    {weakListAll.map(w => (
+                      <div key={w.kanji}
+                        className="flex items-center justify-between px-3 py-2.5 rounded-xl"
+                        style={{ background: "rgba(68,64,60,0.5)", border: "1px solid rgba(220,38,38,0.2)" }}>
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl font-black" style={{ color: "#fff" }}>{w.kanji}</span>
+                          <div>
+                            <span className="text-base font-bold block" style={{ color: "#fca5a5" }}>{w.correct}</span>
+                            <span className="text-xs" style={{ color: "rgba(120,113,108,0.8)" }}>{w.level} • {w.missCount}回ミス</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => { removeFromWeakList(w.kanji); setWeakList(getWeakList()); }}
+                          className="text-xs px-2 py-1 rounded-lg transition-all"
+                          style={{ background: "rgba(34,197,94,0.2)", color: "#86efac", border: "1px solid rgba(34,197,94,0.4)" }}>
+                          覚えた✓
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-center mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>
+                    「覚えた」を押すとリストから削除されます
+                  </p>
+                </>
+              )}
+              <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
+                className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg mt-4"
+                style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+                🥋 もう一度挑戦！
+              </button>
+            </div>
+          )}
         </div>
       </div>
     );
