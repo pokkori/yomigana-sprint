@@ -7,6 +7,31 @@ import KomojuButton from "./KomojuButton";
 const FREE_LIMIT = 10;
 const STORAGE_KEY = "yomigana_daily";
 const TA_BEST_KEY = "yomigana_ta_best";
+const DIFFICULTY_KEY = "yomigana_difficulty";
+
+type Difficulty = "easy" | "normal" | "hard";
+
+const DIFFICULTY_CONFIG = {
+  easy:   { label: "かんたん", emoji: "🟢", desc: "小学1-2年レベル",  bestKey: "yomigana_best_easy",   levels: ["N5"] },
+  normal: { label: "ふつう",   emoji: "🟡", desc: "小学3-4年レベル",  bestKey: "yomigana_best_normal", levels: ["N5", "N4", "N3", "地名"] },
+  hard:   { label: "むずかしい", emoji: "🔴", desc: "小学5-6年レベル", bestKey: "yomigana_best_hard",   levels: ["N2", "N1", "人名", "地名"] },
+} as const;
+
+function getSavedDifficulty(): Difficulty {
+  try { return (localStorage.getItem(DIFFICULTY_KEY) as Difficulty) || "normal"; } catch { return "normal"; }
+}
+function saveDifficulty(d: Difficulty) {
+  try { localStorage.setItem(DIFFICULTY_KEY, d); } catch { /* noop */ }
+}
+
+function getDiffBest(d: Difficulty): number {
+  try { return parseInt(localStorage.getItem(DIFFICULTY_CONFIG[d].bestKey) || "0") || 0; } catch { return 0; }
+}
+function saveDiffBest(d: Difficulty, n: number): boolean {
+  const prev = getDiffBest(d);
+  if (n > prev) { localStorage.setItem(DIFFICULTY_CONFIG[d].bestKey, String(n)); return true; }
+  return false;
+}
 
 function getTaBest(): number {
   try { return parseInt(localStorage.getItem(TA_BEST_KEY) || "0") || 0; } catch { return 0; }
@@ -15,6 +40,13 @@ function saveTaBest(n: number): boolean {
   const prev = getTaBest();
   if (n > prev) { localStorage.setItem(TA_BEST_KEY, String(n)); return true; }
   return false;
+}
+
+function filterByDifficulty(questions: Question[], d: Difficulty): Question[] {
+  const levels = DIFFICULTY_CONFIG[d].levels as readonly string[];
+  const filtered = questions.filter(q => levels.includes(q.level));
+  // フォールバック: 該当問題が少ない場合は全問題を使用
+  return filtered.length >= 5 ? filtered : questions;
 }
 
 // ─── ログインストリーク ─────────────────────────────────────────────────────
@@ -70,8 +102,9 @@ function getDanLevel(correctCount: number, total: number): { badge: string; rank
 }
 
 export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
-  const allQuestions = isPremium ? shuffle([...freeQuestions, ...premiumQuestions]) : shuffle(freeQuestions);
-  const [questions] = useState<Question[]>(allQuestions);
+  const basePool = isPremium ? [...freeQuestions, ...premiumQuestions] : freeQuestions;
+  const [difficulty, setDifficulty] = useState<Difficulty>("normal");
+  const [questions, setQuestions] = useState<Question[]>(() => shuffle(basePool));
   const [idx, setIdx] = useState(0);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -88,11 +121,16 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [taCorrect, setTaCorrect] = useState(0);
   const [taBest, setTaBest] = useState(0);
   const [taNewRecord, setTaNewRecord] = useState(false);
+  const [diffBest, setDiffBest] = useState(0);
+  const [diffNewRecord, setDiffNewRecord] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setDailyCount(getDailyCount());
     setTaBest(getTaBest());
+    const savedDiff = getSavedDifficulty();
+    setDifficulty(savedDiff);
+    setDiffBest(getDiffBest(savedDiff));
     // ログインストリーク更新
     const { streak: ls, isNew } = updateYomiganaStreak();
     setLoginStreak(ls);
@@ -101,6 +139,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       setTimeout(() => setShowLoginStreakBanner(false), 3000);
     }
   }, []);
+
+  // 難易度変更時に問題セットを更新
+  const handleDifficultyChange = useCallback((d: Difficulty) => {
+    setDifficulty(d);
+    saveDifficulty(d);
+    setDiffBest(getDiffBest(d));
+    setQuestions(shuffle(filterByDifficulty(basePool, d)));
+  }, [basePool]); // eslint-disable-line
 
   // タイムアタックタイマー
   useEffect(() => {
@@ -183,10 +229,51 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-4">🥋</div>
           <h2 className="text-3xl font-black mb-2" style={{ color: "#e7e5e4" }}>モードを選択</h2>
-          <p className="text-sm mb-8" style={{ color: "#78716c" }}>どちらのモードで道場に入門しますか？</p>
+          <p className="text-sm mb-5" style={{ color: "#78716c" }}>どちらのモードで道場に入門しますか？</p>
+
+          {/* 難易度選択 */}
+          <div className="mb-6">
+            <p className="text-xs font-bold mb-2 uppercase tracking-widest" style={{ color: "rgba(220,38,38,0.7)" }}>難易度</p>
+            <div className="flex gap-2 justify-center">
+              {(["easy", "normal", "hard"] as Difficulty[]).map((d) => {
+                const cfg = DIFFICULTY_CONFIG[d];
+                const isSelected = difficulty === d;
+                return (
+                  <button
+                    key={d}
+                    onClick={() => handleDifficultyChange(d)}
+                    className="flex-1 py-2 px-2 rounded-full font-black text-sm transition-all active:scale-95"
+                    style={isSelected
+                      ? { background: "rgba(220,38,38,0.35)", color: "#fca5a5", border: "2px solid rgba(220,38,38,0.7)" }
+                      : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "2px solid rgba(68,64,60,0.6)" }
+                    }
+                  >
+                    <span className="block text-base">{cfg.emoji}</span>
+                    <span className="block">{cfg.label}</span>
+                    <span className="block text-xs font-normal mt-0.5" style={{ color: isSelected ? "#fca5a5" : "rgba(120,113,108,0.6)" }}>{cfg.desc}</span>
+                    {getDiffBest(d) > 0 && (
+                      <span className="block text-xs mt-1" style={{ color: isSelected ? "#fbbf24" : "rgba(120,113,108,0.5)" }}>
+                        最高 {getDiffBest(d)}問
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div className="space-y-4">
             <button
-              onClick={() => { setGameMode("normal"); setPhase("playing"); }}
+              onClick={() => {
+                const filtered = shuffle(filterByDifficulty(basePool, difficulty));
+                setQuestions(filtered);
+                setGameMode("normal");
+                setIdx(0);
+                setScore(0);
+                setStreak(0);
+                setDiffNewRecord(false);
+                setPhase("playing");
+              }}
               className="w-full p-5 rounded-2xl text-left transition-all active:scale-95"
               style={{ background: "rgba(68,64,60,0.6)", border: "2px solid rgba(120,113,108,0.4)" }}
             >
@@ -199,7 +286,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               </div>
             </button>
             <button
-              onClick={() => { setGameMode("timeattack"); setTimeLeft(TIME_ATTACK_SECONDS); setTaCorrect(0); setPhase("playing"); }}
+              onClick={() => {
+                const filtered = shuffle(filterByDifficulty(basePool, difficulty));
+                setQuestions(filtered);
+                setGameMode("timeattack");
+                setTimeLeft(TIME_ATTACK_SECONDS);
+                setTaCorrect(0);
+                setPhase("playing");
+              }}
               className="w-full p-5 rounded-2xl text-left transition-all active:scale-95"
               style={{ background: "rgba(220,38,38,0.15)", border: "2px solid rgba(220,38,38,0.5)" }}
             >
@@ -294,14 +388,18 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   if (phase === "result") {
     const total = Math.min(idx + 1, questions.length);
     const correctCount = Math.round(score / 100);
-    const levelLabel = isPremium ? "プレミアム" : "N5";
+    const diffCfg = DIFFICULTY_CONFIG[difficulty];
+    const levelLabel = diffCfg.label;
     const baseUrl = "https://yomigana-sprint.vercel.app";
     const ogUrl = `${baseUrl}/api/og?score=${correctCount}&total=${total}&level=${encodeURIComponent(levelLabel)}`;
     const accuracy = Math.round((correctCount / total) * 100);
     const danLevel = getDanLevel(correctCount, total);
     const rankLabel = accuracy >= 90 ? "漢字マスター級！" : accuracy >= 70 ? "なかなかやるね！" : "もっと練習だ！";
     const topPercent = accuracy >= 100 ? "上位1%" : accuracy >= 90 ? "上位5%" : accuracy >= 70 ? "上位20%" : accuracy >= 50 ? "上位50%" : "入門者";
-    const shareText = `【読み仮名スプリント】${correctCount}/${total}問正解！${topPercent}の漢字力！段位:${danLevel.rank}${danLevel.badge} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
+    const isNewDiffRecord = saveDiffBest(difficulty, correctCount);
+    if (isNewDiffRecord && !diffNewRecord) setDiffNewRecord(true);
+    const currentDiffBest = getDiffBest(difficulty);
+    const shareText = `【読み仮名スプリント】${diffCfg.emoji}${diffCfg.label} ${correctCount}/${total}問正解！${topPercent}の漢字力！段位:${danLevel.rank}${danLevel.badge} 茨城・薔薇・山葵…あなたは全部読める？ → ${baseUrl} #難読漢字 #読み仮名 #漢字クイズ`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogUrl)}`;
     return (
       <div className="min-h-screen flex items-center justify-center px-4"
@@ -309,13 +407,25 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         <div className="max-w-md w-full text-center">
           {/* 段位バッジ */}
           <div className="text-7xl mb-2">{danLevel.badge}</div>
-          <div className="inline-block px-5 py-2 rounded-full font-black text-xl mb-4"
+          <div className="inline-block px-5 py-2 rounded-full font-black text-xl mb-2"
             style={{ background: "rgba(220,38,38,0.2)", color: danLevel.color, border: `1px solid ${danLevel.color}` }}>
             {danLevel.rank}
           </div>
+          {/* 難易度バッジ */}
+          <div className="mb-3">
+            <span className="inline-block px-3 py-1 rounded-full text-sm font-black"
+              style={{ background: "rgba(68,64,60,0.6)", color: "#a8a29e", border: "1px solid rgba(120,113,108,0.4)" }}>
+              {diffCfg.emoji} {diffCfg.label}
+            </span>
+          </div>
           <h2 className="text-2xl font-black mb-2" style={{ color: "#e7e5e4" }}>結果発表！</h2>
           <p className="text-5xl font-black mb-1" style={{ color: "#fca5a5" }}>{score}<span className="text-xl" style={{ color: "#a8a29e" }}>点</span></p>
-          <p className="mb-2" style={{ color: "#78716c" }}>{total}問中 {correctCount}問正解 / 正解率{accuracy}%</p>
+          <p className="mb-1" style={{ color: "#78716c" }}>{total}問中 {correctCount}問正解 / 正解率{accuracy}%</p>
+          {isNewDiffRecord ? (
+            <p className="text-sm font-black mb-1 animate-bounce" style={{ color: "#fbbf24" }}>🏆 [{diffCfg.label}] 自己記録更新！{correctCount}問</p>
+          ) : (
+            <p className="text-xs mb-1" style={{ color: "#78716c" }}>🏆 [{diffCfg.label}] 最高: {currentDiffBest}問</p>
+          )}
           <p className="text-sm font-bold mb-6" style={{ color: danLevel.color }}>{rankLabel}</p>
           <a href={tweetUrl} target="_blank"
             rel="noopener noreferrer"
@@ -326,7 +436,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             </svg>
             {danLevel.rank}をXで自慢する {danLevel.badge}
           </a>
-          <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setPhase("playing"); setShowStreakBanner(false); }}
+          <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setPhase("mode_select"); setShowStreakBanner(false); }}
             className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg"
             style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
             🥋 もう一度挑戦！
