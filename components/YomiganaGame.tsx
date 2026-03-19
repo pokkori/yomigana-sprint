@@ -6,6 +6,16 @@ import KomojuButton from "./KomojuButton";
 
 const FREE_LIMIT = 10;
 const STORAGE_KEY = "yomigana_daily";
+const TA_BEST_KEY = "yomigana_ta_best";
+
+function getTaBest(): number {
+  try { return parseInt(localStorage.getItem(TA_BEST_KEY) || "0") || 0; } catch { return 0; }
+}
+function saveTaBest(n: number): boolean {
+  const prev = getTaBest();
+  if (n > prev) { localStorage.setItem(TA_BEST_KEY, String(n)); return true; }
+  return false;
+}
 
 // ─── ログインストリーク ─────────────────────────────────────────────────────
 
@@ -76,10 +86,13 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [showLoginStreakBanner, setShowLoginStreakBanner] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIME_ATTACK_SECONDS);
   const [taCorrect, setTaCorrect] = useState(0);
+  const [taBest, setTaBest] = useState(0);
+  const [taNewRecord, setTaNewRecord] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     setDailyCount(getDailyCount());
+    setTaBest(getTaBest());
     // ログインストリーク更新
     const { streak: ls, isNew } = updateYomiganaStreak();
     setLoginStreak(ls);
@@ -94,6 +107,8 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     if (gameMode !== "timeattack" || phase === "mode_select" || phase === "timeattack_result") return;
     if (timeLeft <= 0) {
       if (timerRef.current) clearInterval(timerRef.current);
+      setTaNewRecord(saveTaBest(taCorrect));
+      setTaBest(getTaBest());
       setPhase("timeattack_result");
       return;
     }
@@ -219,6 +234,11 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           <div className="text-6xl mb-3 animate-bounce">⏱️</div>
           <h2 className="text-2xl font-black mb-1" style={{ color: "#e7e5e4" }}>60秒終了！</h2>
           <p className="text-6xl font-black mb-1" style={{ color: "#fca5a5" }}>{taCorrect}<span className="text-2xl" style={{ color: "#78716c" }}>問正解</span></p>
+          {taNewRecord ? (
+            <p className="text-base font-black mb-1 animate-bounce" style={{ color: "#fbbf24" }}>🏆 NEW RECORD！</p>
+          ) : (
+            <p className="text-sm mb-1" style={{ color: "#78716c" }}>🏆 自己最高: {taBest}問 {taCorrect >= taBest ? "" : `（あと${taBest - taCorrect + 1}問で更新）`}</p>
+          )}
           <p className="text-lg font-black mb-4" style={{ color: "#fbbf24" }}>{tierLabel}</p>
           {/* スコアバー */}
           <div className="w-full rounded-full h-3 mb-6" style={{ background: "rgba(68,64,60,0.6)" }}>
@@ -355,7 +375,10 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               style={{ color: timeLeft <= 10 ? "#ef4444" : "#fca5a5" }}>
               {timeLeft}<span className="text-base font-normal" style={{ color: "#78716c" }}>s</span>
             </div>
-            <span className="font-black text-lg" style={{ color: "#fbbf24" }}>✓{taCorrect}</span>
+            <div className="text-right">
+              <span className="font-black text-lg block" style={{ color: "#fbbf24" }}>✓{taCorrect}</span>
+              {taBest > 0 && <span className="text-xs" style={{ color: "#78716c" }}>最高{taBest}</span>}
+            </div>
           </div>
         ) : (
           <div className="flex justify-between items-center mb-4">
