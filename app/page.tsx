@@ -157,16 +157,17 @@ export default function HomePage() {
 
       {/* 感情フック */}
       <section className="py-12 px-6 max-w-3xl mx-auto">
-        <h2 className="text-xl font-bold text-center text-gray-800 mb-6">こんな経験ありませんか？</h2>
+        <h2 className="text-xl font-bold text-center text-white mb-6">こんな経験ありませんか？</h2>
         <div className="space-y-4">
           {[
             { icon: "😓", text: "小学生の漢字読みが苦手で、テストのたびに落ち込む..." },
             { icon: "😤", text: "市販のドリルは退屈で、すぐ飽きてしまう..." },
             { icon: "💭", text: "楽しく練習できる方法があれば、もっと続けられるのに..." },
           ].map((item, i) => (
-            <div key={i} className="flex items-center gap-4 bg-red-50 border border-red-200 rounded-xl p-4">
+            <div key={i} className="flex items-center gap-4 rounded-xl p-4"
+              style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
               <span className="text-2xl">{item.icon}</span>
-              <p className="text-gray-700 text-sm font-medium">{item.text}</p>
+              <p className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.85)" }}>{item.text}</p>
             </div>
           ))}
         </div>
