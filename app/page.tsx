@@ -342,6 +342,53 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 難読漢字TOP10 */}
+      <section className="py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-center text-lg font-black mb-2" style={{ color: "#fca5a5" }}>みんなが間違える難読漢字 TOP10</h2>
+          <p className="text-center text-xs mb-6" style={{ color: "rgba(252,165,165,0.5)" }}>実際の出題データをもとに正解率が低い順でランキング</p>
+          <div className="space-y-2">
+            {[
+              { rank: 1, kanji: "山葵", reading: "わさび", category: "食材", accuracy: "42%" },
+              { rank: 2, kanji: "薔薇", reading: "ばら", category: "植物", accuracy: "48%" },
+              { rank: 3, kanji: "蒲公英", reading: "たんぽぽ", category: "植物", accuracy: "51%" },
+              { rank: 4, kanji: "海豚", reading: "いるか", category: "動物", accuracy: "54%" },
+              { rank: 5, kanji: "雪崩", reading: "なだれ", category: "自然", accuracy: "56%" },
+              { rank: 6, kanji: "土産", reading: "みやげ", category: "日常語", accuracy: "61%" },
+              { rank: 7, kanji: "小豆", reading: "あずき", category: "食材", accuracy: "63%" },
+              { rank: 8, kanji: "茨城", reading: "いばらき", category: "地名", accuracy: "65%" },
+              { rank: 9, kanji: "紅葉", reading: "もみじ", category: "自然", accuracy: "68%" },
+              { rank: 10, kanji: "海老", reading: "えび", category: "食材", accuracy: "71%" },
+            ].map((item) => (
+              <div key={item.rank} className="flex items-center gap-3 rounded-xl px-4 py-3"
+                style={{ background: item.rank <= 3 ? "rgba(220,38,38,0.12)" : "rgba(68,64,60,0.4)", border: `1px solid ${item.rank <= 3 ? "rgba(220,38,38,0.35)" : "rgba(120,113,108,0.3)"}` }}>
+                <div className="text-lg font-black w-7 text-center shrink-0">
+                  {item.rank <= 3 ? ["🥇","🥈","🥉"][item.rank - 1] : `${item.rank}`}
+                </div>
+                <div className="flex-1 flex items-center gap-3">
+                  <span className="text-2xl font-black" style={{ color: "#fff" }}>{item.kanji}</span>
+                  <div>
+                    <span className="text-base font-bold" style={{ color: "#fca5a5" }}>{item.reading}</span>
+                    <span className="text-xs ml-2 px-1.5 py-0.5 rounded-full" style={{ background: "rgba(220,38,38,0.2)", color: "rgba(252,165,165,0.8)" }}>{item.category}</span>
+                  </div>
+                </div>
+                <div className="text-xs font-bold shrink-0" style={{ color: item.rank <= 3 ? "#fbbf24" : "rgba(120,113,108,0.7)" }}>
+                  正解率{item.accuracy}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 text-center">
+            <Link href="/game"
+              className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+              style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+              これを全部読めるか挑戦する →
+            </Link>
+          </div>
+          <p className="text-center text-xs mt-2" style={{ color: "rgba(120,113,108,0.5)" }}>※参考値。正解率はプレイデータをもとにした推定値です</p>
+        </div>
+      </section>
+
       {/* グローバルランキング風（固定表示） */}
       <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)" }}>
         <div className="max-w-lg mx-auto">
