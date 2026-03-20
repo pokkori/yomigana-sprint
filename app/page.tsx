@@ -597,6 +597,51 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 他のアプリとの比較 */}
+      <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)", borderTop: "1px solid rgba(220,38,38,0.15)", borderBottom: "1px solid rgba(220,38,38,0.15)" }}>
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-center text-lg font-black mb-2" style={{ color: "#fca5a5" }}>他の漢字学習アプリとの違い</h2>
+          <p className="text-center text-xs mb-5" style={{ color: "rgba(252,165,165,0.5)" }}>読み仮名スプリントが選ばれる理由</p>
+          <div className="overflow-x-auto rounded-2xl" style={{ border: "1px solid rgba(220,38,38,0.25)" }}>
+            <table className="w-full text-xs">
+              <thead>
+                <tr style={{ background: "rgba(153,27,27,0.8)" }}>
+                  <th className="px-3 py-3 text-left font-bold" style={{ color: "#fca5a5" }}>機能</th>
+                  <th className="px-3 py-3 text-center font-bold" style={{ color: "#fbbf24" }}>読み仮名スプリント</th>
+                  <th className="px-3 py-3 text-center font-bold" style={{ color: "rgba(252,165,165,0.6)" }}>Duolingo</th>
+                  <th className="px-3 py-3 text-center font-bold" style={{ color: "rgba(252,165,165,0.6)" }}>市販ドリル</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  { feature: "難読漢字特化", us: "✅ 3,000問", a: "❌ 漢字薄い", b: "⚠️ 少ない" },
+                  { feature: "ゲーム感覚", us: "✅ 段位制", a: "✅ あり", b: "❌ なし" },
+                  { feature: "即プレイ可能", us: "✅ 登録不要", a: "❌ 登録必須", b: "✅ すぐ使える" },
+                  { feature: "JLPT対応", us: "✅ N5〜N1", a: "⚠️ 一部", b: "⚠️ 一部" },
+                  { feature: "スマホ無料", us: "✅ 毎日10問", a: "⚠️ 広告多い", b: "❌ 有料のみ" },
+                  { feature: "地名・人名漢字", us: "✅ 豊富", a: "❌ ほぼなし", b: "⚠️ 少ない" },
+                ].map((row, i) => (
+                  <tr key={i} style={{ background: i % 2 === 0 ? "rgba(68,64,60,0.4)" : "rgba(68,64,60,0.2)", borderBottom: "1px solid rgba(220,38,38,0.1)" }}>
+                    <td className="px-3 py-2.5 font-bold" style={{ color: "#e7e5e4" }}>{row.feature}</td>
+                    <td className="px-3 py-2.5 text-center font-bold" style={{ color: "#fbbf24" }}>{row.us}</td>
+                    <td className="px-3 py-2.5 text-center" style={{ color: "rgba(252,165,165,0.6)" }}>{row.a}</td>
+                    <td className="px-3 py-2.5 text-center" style={{ color: "rgba(252,165,165,0.6)" }}>{row.b}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="text-center text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>※調査参考値。各サービスの内容は変更になる場合があります</p>
+          <div className="mt-4 text-center">
+            <Link href="/game"
+              className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+              style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+              今すぐ無料で始める →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ */}
       <section className="py-10 px-4 max-w-lg mx-auto">
         <h2 className="text-center text-lg font-bold mb-5" style={{ color: "#fca5a5" }}>よくある質問</h2>
