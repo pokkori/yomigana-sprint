@@ -4,6 +4,123 @@ import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
 import KomojuButton from "./KomojuButton";
 
+// ─── 段位認定証 Canvas生成 ────────────────────────────────────────────────────
+function getScoreRank(score: number): { rank: string; badge: string } {
+  if (score >= 96) return { rank: "名人", badge: "👑" };
+  if (score >= 86) return { rank: "五段", badge: "⚔️" };
+  if (score >= 71) return { rank: "四段", badge: "⚔️" };
+  if (score >= 51) return { rank: "三段", badge: "🥋" };
+  if (score >= 31) return { rank: "二段", badge: "🥋" };
+  return { rank: "初段", badge: "📖" };
+}
+
+function downloadCertificate(score: number, totalScore: number, diffLabel: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = 800;
+  canvas.height = 500;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+
+  // 背景グラデーション
+  const grad = ctx.createLinearGradient(0, 0, 800, 500);
+  grad.addColorStop(0, "#1a1a2e");
+  grad.addColorStop(1, "#16213e");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, 800, 500);
+
+  // 和風ライン装飾（上下）
+  ctx.strokeStyle = "rgba(220,38,38,0.6)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(20, 20, 760, 460);
+  ctx.strokeStyle = "rgba(251,191,36,0.35)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(30, 30, 740, 440);
+
+  // タイトル
+  ctx.fillStyle = "rgba(252,165,165,0.9)";
+  ctx.font = "bold 28px sans-serif";
+  ctx.textAlign = "center";
+  ctx.fillText("読み仮名 段位認定証", 400, 90);
+
+  // 難易度
+  ctx.fillStyle = "rgba(168,162,158,0.8)";
+  ctx.font = "18px sans-serif";
+  ctx.fillText(diffLabel + " モード", 400, 128);
+
+  // 段位
+  const correctCount = Math.round(totalScore / 100);
+  const { rank } = getScoreRank(correctCount);
+  ctx.fillStyle = "#fbbf24";
+  ctx.font = "bold 80px sans-serif";
+  ctx.fillText(rank, 400, 250);
+
+  // スコア
+  ctx.fillStyle = "#fbbf24";
+  ctx.font = "bold 56px sans-serif";
+  ctx.fillText(`${correctCount}問正解`, 400, 330);
+
+  // ポイント
+  ctx.fillStyle = "rgba(252,165,165,0.7)";
+  ctx.font = "22px sans-serif";
+  ctx.fillText(`${totalScore}点`, 400, 370);
+
+  // 日付
+  const today = new Date().toLocaleDateString("ja-JP", { year: "numeric", month: "long", day: "numeric" });
+  ctx.fillStyle = "rgba(120,113,108,0.8)";
+  ctx.font = "16px sans-serif";
+  ctx.fillText(today, 400, 415);
+
+  // ハッシュタグ
+  ctx.fillStyle = "rgba(220,38,38,0.7)";
+  ctx.font = "bold 16px sans-serif";
+  ctx.fillText("#読み仮名スプリント", 400, 445);
+
+  // ダウンロード
+  const link = document.createElement("a");
+  link.download = `yomigana-certificate-${rank}.png`;
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+}
+
+function CertificateButton({ score, diffLabel }: { score: number; diffLabel: string }) {
+  const handleDownload = () => {
+    downloadCertificate(Math.round(score / 100), score, diffLabel);
+  };
+
+  const correctCount = Math.round(score / 100);
+  const { rank } = getScoreRank(correctCount);
+  const shareText = `【読み仮名スプリント】段位認定「${rank}」を取得！${score}点達成 #読み仮名スプリント #難読漢字`;
+  const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent("https://yomigana-sprint.vercel.app")}`;
+
+  return (
+    <div className="rounded-2xl p-4 mb-3" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)" }}>
+      <p className="text-center text-xs font-bold mb-3" style={{ color: "#fbbf24" }}>🏅 段位認定証を取得する</p>
+      <div className="flex gap-2">
+        <button
+          onClick={handleDownload}
+          className="flex-1 flex items-center justify-center gap-1.5 font-black py-2.5 rounded-xl text-sm active:scale-95 transition-transform"
+          style={{ background: "linear-gradient(135deg, #d97706, #92400e)", color: "#fff" }}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          認定証DL
+        </button>
+        <a
+          href={tweetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 flex items-center justify-center gap-1.5 font-black py-2.5 rounded-xl text-sm active:scale-95 transition-transform"
+          style={{ background: "#18181b", color: "#fff" }}
+        >
+          <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          段位シェア
+        </a>
+      </div>
+    </div>
+  );
+}
+
 const FREE_LIMIT = 10;
 const STORAGE_KEY = "yomigana_daily";
 const TA_BEST_KEY = "yomigana_ta_best";
@@ -516,6 +633,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                   </div>
                 </div>
               )}
+              <CertificateButton score={score} diffLabel={diffCfg.label} />
               <a href={tweetUrl} target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-all active:scale-95"

@@ -3,6 +3,153 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 
+// ─── 今日の一問 Wordle方式 ─────────────────────────────────────────────────
+const DAILY_QUIZ_POOL = [
+  { kanji: "茨城", reading: "いばらき", hint: "関東地方の県" },
+  { kanji: "薔薇", reading: "ばら", hint: "棘がある花" },
+  { kanji: "山葵", reading: "わさび", hint: "緑色の薬味" },
+  { kanji: "蒲公英", reading: "たんぽぽ", hint: "春の黄色い花" },
+  { kanji: "海豚", reading: "いるか", hint: "海の哺乳類" },
+  { kanji: "雪崩", reading: "なだれ", hint: "雪が崩れ落ちる現象" },
+  { kanji: "土産", reading: "みやげ", hint: "旅行先で買うもの" },
+  { kanji: "小豆", reading: "あずき", hint: "和菓子に使う豆" },
+  { kanji: "紅葉", reading: "もみじ", hint: "秋に色づく葉" },
+  { kanji: "海老", reading: "えび", hint: "長いひげがある甲殻類" },
+  { kanji: "向日葵", reading: "ひまわり", hint: "夏の花" },
+  { kanji: "紫陽花", reading: "あじさい", hint: "梅雨の花" },
+  { kanji: "河豚", reading: "ふぐ", hint: "毒を持つ魚" },
+  { kanji: "蛍", reading: "ほたる", hint: "夜に光る虫" },
+  { kanji: "螺旋", reading: "らせん", hint: "くるくる巻いた形" },
+  { kanji: "牡蠣", reading: "かき", hint: "海の貝類" },
+  { kanji: "鳥取", reading: "とっとり", hint: "山陰地方の県" },
+  { kanji: "鹿児島", reading: "かごしま", hint: "九州南部の県" },
+  { kanji: "沖縄", reading: "おきなわ", hint: "日本最南端の県" },
+  { kanji: "愛媛", reading: "えひめ", hint: "四国の県" },
+  { kanji: "岐阜", reading: "ぎふ", hint: "中部地方の県" },
+  { kanji: "滋賀", reading: "しが", hint: "琵琶湖がある県" },
+];
+
+function getTodayQuiz() {
+  const seed = new Date().toDateString();
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return DAILY_QUIZ_POOL[hash % DAILY_QUIZ_POOL.length];
+}
+
+function DailyWordleSection() {
+  const quiz = getTodayQuiz();
+  const [input, setInput] = useState("");
+  const [result, setResult] = useState<"idle" | "correct" | "wrong">("idle");
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [attempts, setAttempts] = useState(0);
+
+  const handleSubmit = () => {
+    const normalized = input.trim().replace(/\s/g, "");
+    if (!normalized) return;
+    setAttempts(a => a + 1);
+    if (normalized === quiz.reading) {
+      setResult("correct");
+    } else {
+      setResult("wrong");
+    }
+  };
+
+  const shareText = `今日の漢字「${quiz.kanji}」の読み方がわかった！答えは「${quiz.reading}」 #読み仮名スプリント #難読漢字`;
+  const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent("https://yomigana-sprint.vercel.app")}`;
+
+  return (
+    <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "20px", padding: "20px" }}>
+      <div className="flex items-center gap-2 mb-1">
+        <span className="text-xl">📅</span>
+        <h2 className="text-lg font-black" style={{ color: "#fbbf24" }}>今日の挑戦漢字</h2>
+        <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(251,191,36,0.2)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.4)" }}>
+          全員共通
+        </span>
+      </div>
+      <p className="text-xs mb-4" style={{ color: "rgba(251,191,36,0.6)" }}>毎日1問・全ユーザー同じ漢字に挑戦！</p>
+
+      {/* 漢字表示 */}
+      <div className="text-center mb-4">
+        <p className="text-6xl font-black mb-1" style={{ color: "#fff", textShadow: "0 0 20px rgba(251,191,36,0.3)" }}>{quiz.kanji}</p>
+        <p className="text-xs" style={{ color: "rgba(251,191,36,0.55)" }}>ヒント: {quiz.hint}</p>
+      </div>
+
+      {result === "idle" && (
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && handleSubmit()}
+            placeholder="ひらがなで入力"
+            className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold"
+            style={{ background: "rgba(0,0,0,0.3)", color: "#fff", border: "1px solid rgba(251,191,36,0.4)", outline: "none" }}
+          />
+          <button
+            onClick={handleSubmit}
+            className="px-5 py-2.5 rounded-xl font-black text-sm active:scale-95 transition-transform"
+            style={{ background: "linear-gradient(135deg, #d97706, #92400e)", color: "#fff" }}
+          >
+            判定
+          </button>
+        </div>
+      )}
+
+      {result === "wrong" && !showAnswer && (
+        <div className="text-center">
+          <p className="font-black text-base mb-3" style={{ color: "#fca5a5" }}>❌ 不正解…（{attempts}回目）</p>
+          <p className="text-sm mb-3" style={{ color: "rgba(252,165,165,0.7)" }}>もう一度試しますか？</p>
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={() => { setInput(""); setResult("idle"); }}
+              className="px-5 py-2 rounded-xl font-black text-sm active:scale-95"
+              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}
+            >
+              再挑戦
+            </button>
+            <button
+              onClick={() => setShowAnswer(true)}
+              className="px-5 py-2 rounded-xl font-black text-sm active:scale-95"
+              style={{ background: "rgba(68,64,60,0.5)", color: "#a8a29e", border: "1px solid rgba(120,113,108,0.4)" }}
+            >
+              答えを見る
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showAnswer && result !== "correct" && (
+        <div className="text-center">
+          <p className="text-sm mb-1" style={{ color: "rgba(251,191,36,0.7)" }}>正解は…</p>
+          <p className="text-3xl font-black mb-3" style={{ color: "#fbbf24" }}>{quiz.reading}</p>
+          <a href={tweetUrl} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-xl font-black text-sm active:scale-95"
+            style={{ background: "#18181b", color: "#fff" }}>
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            答えをシェア
+          </a>
+        </div>
+      )}
+
+      {result === "correct" && (
+        <div className="text-center">
+          <p className="text-4xl mb-2">🎉</p>
+          <p className="font-black text-lg mb-1" style={{ color: "#fbbf24" }}>正解！</p>
+          <p className="text-sm mb-4" style={{ color: "rgba(251,191,36,0.7)" }}>{quiz.kanji} = {quiz.reading}{attempts > 1 ? `（${attempts}回目で正解）` : "（一発正解！）"}</p>
+          <a href={tweetUrl} target="_blank" rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-black text-sm active:scale-95"
+            style={{ background: "#18181b", color: "#fff" }}>
+            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            正解をXでシェア！
+          </a>
+        </div>
+      )}
+    </div>
+  );
+}
+
 const GOAL_KEY = "yomigana_daily_goal";
 const GOAL_PROGRESS_KEY = "yomigana_goal_progress";
 
@@ -191,6 +338,13 @@ export default function HomePage() {
             道場に入門する（無料）
           </Link>
           <p className="text-xs mt-4" style={{ color: "rgba(252,165,165,0.45)" }}>登録不要・クレジットカード不要</p>
+        </div>
+      </section>
+
+      {/* 今日の挑戦漢字 */}
+      <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)", borderBottom: "1px solid rgba(251,191,36,0.2)" }}>
+        <div className="max-w-lg mx-auto">
+          <DailyWordleSection />
         </div>
       </section>
 
@@ -718,6 +872,40 @@ export default function HomePage() {
               className="inline-block text-xs font-bold py-2 px-5 rounded-xl"
               style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}>
               学習レポートを見る →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* 苦手漢字克服プログラム */}
+      <section className="py-12 px-4" style={{ background: "rgba(0,0,0,0.2)" }}>
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-xl font-black mb-2" style={{ color: "#fca5a5" }}>苦手な漢字を集中攻略する方法</h2>
+          <p className="text-sm mb-6" style={{ color: "rgba(252,165,165,0.6)" }}>間違えた漢字を自動記録→集中練習で弱点を確実に克服</p>
+          <div className="space-y-3 mb-6">
+            {[
+              { step: "STEP 1", icon: "🎮", title: "ゲームをプレイ", desc: "通常モード・タイムアタックどちらでもOK。難易度は自分のレベルに合わせて選択。" },
+              { step: "STEP 2", icon: "📝", title: "苦手漢字を自動記録", desc: "間違えた漢字は「苦手リスト」に自動保存。何回間違えたかも記録されます。" },
+              { step: "STEP 3", icon: "🎯", title: "集中練習で克服", desc: "結果画面の「苦手克服」タブから苦手漢字だけを集中的に復習。覚えたら「覚えた」ボタンで削除。" },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-4 rounded-xl p-4"
+                style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)" }}>
+                <div className="flex-shrink-0 text-center">
+                  <div className="text-xs font-black mb-1" style={{ color: "rgba(220,38,38,0.7)" }}>{item.step}</div>
+                  <div className="text-2xl">{item.icon}</div>
+                </div>
+                <div>
+                  <h3 className="font-black text-sm mb-1" style={{ color: "#fca5a5" }}>{item.title}</h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.7)" }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="text-center">
+            <Link href="/game"
+              className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+              style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+              苦手漢字を克服する →
             </Link>
           </div>
         </div>
