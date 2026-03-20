@@ -79,6 +79,12 @@ export default function ReportPage() {
   }, []);
 
   const maxCount = Math.max(...weekProgress.map(d => d.count), 1);
+  const weeklyGoal = 70; // 1日10問×7日 = 70問/週
+  const weeklyRate = Math.min(100, Math.round((totalWeek / weeklyGoal) * 100));
+  // SVG circle progress
+  const circleR = 36;
+  const circumference = 2 * Math.PI * circleR;
+  const dashOffset = circumference * (1 - weeklyRate / 100);
 
   const levelLabels: Record<string, string> = {
     N5: "N5（基礎）",
@@ -124,6 +130,50 @@ export default function ReportPage() {
               {weakList.length}
             </div>
             <div className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.7)" }}>苦手漢字数</div>
+          </div>
+        </div>
+
+        {/* 週次達成率サークル */}
+        <div className="rounded-2xl p-5 flex items-center gap-6"
+          style={{ background: "rgba(68,64,60,0.4)", border: "1px solid rgba(220,38,38,0.2)" }}>
+          <div className="flex-shrink-0">
+            <svg width="96" height="96" viewBox="0 0 96 96">
+              <circle cx="48" cy="48" r={circleR} fill="none" stroke="rgba(68,64,60,0.8)" strokeWidth="8" />
+              <circle cx="48" cy="48" r={circleR} fill="none"
+                stroke={weeklyRate >= 100 ? "#22c55e" : weeklyRate >= 70 ? "#fbbf24" : "#dc2626"}
+                strokeWidth="8"
+                strokeLinecap="round"
+                strokeDasharray={circumference}
+                strokeDashoffset={dashOffset}
+                transform="rotate(-90 48 48)"
+                style={{ transition: "stroke-dashoffset 1s ease" }}
+              />
+              <text x="48" y="48" textAnchor="middle" dominantBaseline="middle"
+                fill={weeklyRate >= 100 ? "#22c55e" : "#fca5a5"}
+                fontSize="16" fontWeight="900">
+                {weeklyRate}%
+              </text>
+            </svg>
+          </div>
+          <div className="flex-1">
+            <h2 className="text-base font-black mb-1" style={{ color: "#fca5a5" }}>今週の達成率</h2>
+            <p className="text-xs mb-2" style={{ color: "rgba(252,165,165,0.6)" }}>
+              {totalWeek} / {weeklyGoal}問（週目標）
+            </p>
+            {weeklyRate >= 100 ? (
+              <div className="text-xs font-bold px-2 py-1 rounded-full w-fit" style={{ background: "rgba(34,197,94,0.2)", color: "#86efac", border: "1px solid rgba(34,197,94,0.4)" }}>
+                🎉 週目標達成！
+              </div>
+            ) : (
+              <p className="text-xs" style={{ color: "rgba(252,165,165,0.5)" }}>
+                あと{weeklyGoal - totalWeek}問で週目標達成
+              </p>
+            )}
+            {streak >= 7 && (
+              <div className="mt-2 text-xs font-bold px-2 py-1 rounded-full w-fit" style={{ background: "rgba(251,191,36,0.2)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.4)" }}>
+                ⚡ 7日以上連続達成中！
+              </div>
+            )}
           </div>
         </div>
 

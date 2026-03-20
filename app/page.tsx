@@ -341,6 +341,41 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ストリークマイルストーン（loginStreakがある場合） */}
+      {loginStreak >= 1 && (
+        <section className="py-8 px-4" style={{ background: "rgba(220,38,38,0.06)", borderBottom: "1px solid rgba(220,38,38,0.2)" }}>
+          <div className="max-w-lg mx-auto text-center">
+            <p className="text-xs font-bold mb-3 tracking-widest" style={{ color: "rgba(252,165,165,0.6)" }}>連続学習マイルストーン</p>
+            <div className="flex justify-center gap-6 mb-3">
+              {[
+                { days: 3, badge: "🔥", label: "3日連続", color: "#f97316" },
+                { days: 7, badge: "⚡", label: "7日連続", color: "#fbbf24" },
+                { days: 30, badge: "👑", label: "30日連続", color: "#a855f7" },
+              ].map(m => (
+                <div key={m.days} className="flex flex-col items-center gap-1.5">
+                  <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition-all ${loginStreak >= m.days ? "scale-110" : "opacity-35"}`}
+                    style={{
+                      background: loginStreak >= m.days ? `${m.color}22` : "rgba(68,64,60,0.3)",
+                      borderColor: loginStreak >= m.days ? m.color : "rgba(68,64,60,0.5)",
+                      boxShadow: loginStreak >= m.days ? `0 0 12px ${m.color}55` : "none",
+                    }}>
+                    {m.badge}
+                  </div>
+                  <span className="text-xs font-bold" style={{ color: loginStreak >= m.days ? m.color : "rgba(120,113,108,0.5)" }}>{m.label}</span>
+                  {loginStreak >= m.days && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${m.color}22`, color: m.color }}>達成！</span>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm font-black" style={{ color: "#fca5a5" }}>
+              🔥 現在 {loginStreak}日連続！この調子で続けよう
+            </p>
+            {loginStreak < 3 && <p className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.5)" }}>あと{3 - loginStreak}日で🔥3日連続マイルストーン達成！</p>}
+          </div>
+        </section>
+      )}
+
       {/* 今日の挑戦漢字 */}
       <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)", borderBottom: "1px solid rgba(251,191,36,0.2)" }}>
         <div className="max-w-lg mx-auto">

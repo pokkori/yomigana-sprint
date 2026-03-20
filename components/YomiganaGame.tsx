@@ -4,6 +4,17 @@ import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
 import KomojuButton from "./KomojuButton";
 
+// ─── Web Speech API ────────────────────────────────────────────────────────
+function speakReading(text: string) {
+  if (typeof speechSynthesis === "undefined") return;
+  speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = "ja-JP";
+  utter.rate = 0.9;
+  utter.pitch = 1.1;
+  speechSynthesis.speak(utter);
+}
+
 // ─── 段位認定証 Canvas生成 ────────────────────────────────────────────────────
 function getScoreRank(score: number): { rank: string; badge: string } {
   if (score >= 96) return { rank: "名人", badge: "👑" };
@@ -126,6 +137,28 @@ const STORAGE_KEY = "yomigana_daily";
 const TA_BEST_KEY = "yomigana_ta_best";
 const DIFFICULTY_KEY = "yomigana_difficulty";
 const WEAK_LIST_KEY = "yomigana_weak_list";
+const VOICE_KEY = "yomigana_voice_enabled";
+
+function getSavedVoice(): boolean {
+  try { return localStorage.getItem(VOICE_KEY) !== "0"; } catch { return true; }
+}
+function saveVoice(v: boolean) {
+  try { localStorage.setItem(VOICE_KEY, v ? "1" : "0"); } catch { /* noop */ }
+}
+
+// ─── ストリークマイルストーン ────────────────────────────────────────────
+const STREAK_MILESTONES = [
+  { days: 3, label: "3日連続", badge: "🔥", color: "#f97316" },
+  { days: 7, label: "7日連続", badge: "⚡", color: "#fbbf24" },
+  { days: 30, label: "30日連続", badge: "👑", color: "#a855f7" },
+];
+
+function getNextMilestone(streak: number): { days: number; label: string; badge: string; color: string } | null {
+  for (const m of STREAK_MILESTONES) {
+    if (streak < m.days) return m;
+  }
+  return null;
+}
 
 // ─── 苦手リスト管理 ──────────────────────────────────────────────────────────
 type WeakItem = { kanji: string; correct: string; level: string; missCount: number };
@@ -272,6 +305,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [wrongQuestions, setWrongQuestions] = useState<Question[]>([]);
   const [weakList, setWeakList] = useState<WeakItem[]>([]);
   const [resultTab, setResultTab] = useState<"result" | "weak">("result");
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -281,6 +315,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     setDifficulty(savedDiff);
     setDiffBest(getDiffBest(savedDiff));
     setWeakList(getWeakList());
+    setVoiceEnabled(getSavedVoice());
     // ログインストリーク更新
     const { streak: ls, isNew } = updateYomiganaStreak();
     setLoginStreak(ls);
@@ -340,7 +375,11 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         setShowStreakBanner(true);
         setTimeout(() => setShowStreakBanner(false), 1500);
       }
+      // 音声読み上げ
+      if (voiceEnabled) speakReading(current.correct);
     } else {
+      // 不正解時も正解読み上げ
+      if (voiceEnabled) speakReading(current.correct);
       setStreak(0);
       // 間違えた問題を記録
       setWrongQuestions(prev => {
@@ -380,13 +419,56 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
 
   // モード選択画面
   if (phase === "mode_select") {
+    const nextMilestone = getNextMilestone(loginStreak);
     return (
       <div className="min-h-screen flex items-center justify-center px-4"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         <div className="max-w-md w-full text-center">
           <div className="text-6xl mb-4">🥋</div>
           <h2 className="text-3xl font-black mb-2" style={{ color: "#e7e5e4" }}>モードを選択</h2>
-          <p className="text-sm mb-5" style={{ color: "#78716c" }}>どちらのモードで道場に入門しますか？</p>
+          <p className="text-sm mb-3" style={{ color: "#78716c" }}>どちらのモードで道場に入門しますか？</p>
+
+          {/* ストリークマイルストーン */}
+          {loginStreak > 0 && (
+            <div className="mb-4">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                {STREAK_MILESTONES.map(m => (
+                  <div key={m.days} className="flex flex-col items-center gap-1">
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center text-lg font-black border-2 transition-all ${loginStreak >= m.days ? "scale-110" : "opacity-40"}`}
+                      style={{
+                        background: loginStreak >= m.days ? `${m.color}33` : "rgba(68,64,60,0.4)",
+                        borderColor: loginStreak >= m.days ? m.color : "rgba(68,64,60,0.6)",
+                      }}>
+                      {m.badge}
+                    </div>
+                    <span className="text-[9px] font-bold" style={{ color: loginStreak >= m.days ? m.color : "rgba(120,113,108,0.5)" }}>{m.label}</span>
+                  </div>
+                ))}
+              </div>
+              {nextMilestone && (
+                <p className="text-xs font-bold" style={{ color: "#78716c" }}>
+                  あと{nextMilestone.days - loginStreak}日で {nextMilestone.badge} {nextMilestone.label}達成！
+                </p>
+              )}
+              {!nextMilestone && (
+                <p className="text-xs font-bold" style={{ color: "#a855f7" }}>👑 全マイルストーン達成！{loginStreak}日連続継続中</p>
+              )}
+            </div>
+          )}
+
+          {/* 音声読み上げトグル */}
+          <div className="flex items-center justify-center gap-2 mb-5">
+            <button
+              onClick={() => { const v = !voiceEnabled; setVoiceEnabled(v); saveVoice(v); }}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={voiceEnabled
+                ? { background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }
+                : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "1px solid rgba(68,64,60,0.6)" }
+              }
+            >
+              {voiceEnabled ? "🔊 読み上げON" : "🔇 読み上げOFF"}
+            </button>
+          </div>
 
           {/* 難易度選択 */}
           <div className="mb-6">
@@ -760,9 +842,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         )}
         {/* ログインストリーク表示 */}
         {loginStreak >= 2 && (
-          <div className="flex items-center gap-2 mb-3 px-3 py-1.5 rounded-full w-fit mx-auto"
-            style={{ background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.3)" }}>
-            <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>🔥 {loginStreak}日連続道場</span>
+          <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
+              style={{ background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.3)" }}>
+              {loginStreak >= 30 ? <span className="text-sm">👑</span> : loginStreak >= 7 ? <span className="text-sm">⚡</span> : <span className="text-sm">🔥</span>}
+              <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>{loginStreak}日連続道場</span>
+            </div>
           </div>
         )}
 
@@ -813,12 +898,24 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           })}
         </div>
 
-        {/* 無料残り表示 */}
-        {!isPremium && (
-          <p className="text-center text-xs mt-8" style={{ color: "rgba(120,113,108,0.5)" }}>
-            本日の無料問題: {FREE_LIMIT - dailyCount}問残り
-          </p>
-        )}
+        {/* 音声トグル & 無料残り表示 */}
+        <div className="flex items-center justify-between mt-8">
+          <button
+            onClick={() => { const v = !voiceEnabled; setVoiceEnabled(v); saveVoice(v); }}
+            className="text-xs px-3 py-1 rounded-full transition-all"
+            style={voiceEnabled
+              ? { background: "rgba(220,38,38,0.15)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.3)" }
+              : { background: "rgba(68,64,60,0.3)", color: "rgba(120,113,108,0.5)", border: "1px solid rgba(68,64,60,0.5)" }
+            }
+          >
+            {voiceEnabled ? "🔊 読み上げON" : "🔇 読み上げOFF"}
+          </button>
+          {!isPremium && (
+            <p className="text-xs" style={{ color: "rgba(120,113,108,0.5)" }}>
+              無料: {FREE_LIMIT - dailyCount}問残り
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
