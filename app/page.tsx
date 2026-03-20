@@ -1,13 +1,154 @@
+"use client";
 import Link from "next/link";
 import Image from "next/image";
+import { useState, useEffect } from "react";
+
+const GOAL_KEY = "yomigana_daily_goal";
+const GOAL_PROGRESS_KEY = "yomigana_goal_progress";
+
+function DailyGoalSection() {
+  const [goal, setGoal] = useState(10);
+  const [progress, setProgress] = useState(0);
+  const [editing, setEditing] = useState(false);
+  const [inputVal, setInputVal] = useState(10);
+  const [weakCount, setWeakCount] = useState(0);
+
+  useEffect(() => {
+    try {
+      const savedGoal = parseInt(localStorage.getItem(GOAL_KEY) || "10");
+      const today = new Date().toISOString().slice(0, 10);
+      const rawProgress = localStorage.getItem(GOAL_PROGRESS_KEY);
+      const progressData = rawProgress ? JSON.parse(rawProgress) : {};
+      const todayProgress = progressData[today] ?? 0;
+      setGoal(savedGoal);
+      setInputVal(savedGoal);
+      setProgress(todayProgress);
+      const weakList = JSON.parse(localStorage.getItem("yomigana_weak_list") ?? "[]");
+      setWeakCount(Array.isArray(weakList) ? weakList.length : 0);
+    } catch { /* noop */ }
+  }, []);
+
+  const saveGoal = () => {
+    const v = Math.max(5, Math.min(100, inputVal));
+    setGoal(v);
+    try { localStorage.setItem(GOAL_KEY, String(v)); } catch { /* noop */ }
+    setEditing(false);
+  };
+
+  const pct = Math.min(100, Math.round((progress / goal) * 100));
+  const done = progress >= goal;
+
+  return (
+    <div style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)", borderRadius: "20px", padding: "20px" }}>
+      <h2 className="text-center text-lg font-black mb-4" style={{ color: "#fca5a5" }}>今日の目標</h2>
+
+      {/* 目標設定 */}
+      <div className="flex items-center justify-between mb-3">
+        {editing ? (
+          <div className="flex items-center gap-2">
+            <input
+              type="number" min={5} max={100} value={inputVal}
+              onChange={e => setInputVal(parseInt(e.target.value) || 10)}
+              className="w-20 text-center font-black rounded-lg px-2 py-1 text-sm border"
+              style={{ background: "rgba(0,0,0,0.3)", color: "#fff", borderColor: "rgba(220,38,38,0.5)" }}
+            />
+            <span style={{ color: "#fca5a5", fontSize: "13px" }}>問</span>
+            <button onClick={saveGoal}
+              className="text-xs font-bold px-3 py-1 rounded-lg"
+              style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+              保存
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <span className="text-2xl font-black" style={{ color: "#fca5a5" }}>目標: {goal}問</span>
+            <button onClick={() => setEditing(true)}
+              className="text-xs px-2 py-1 rounded-lg"
+              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>
+              変更
+            </button>
+          </div>
+        )}
+        {done && <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "#16a34a", color: "#fff" }}>🎉 達成！</span>}
+      </div>
+
+      {/* プログレスバー */}
+      <div className="mb-3">
+        <div className="flex justify-between text-xs mb-1" style={{ color: "rgba(252,165,165,0.7)" }}>
+          <span>今日の進捗: {progress}問</span>
+          <span>{pct}%</span>
+        </div>
+        <div className="w-full h-4 rounded-full overflow-hidden" style={{ background: "rgba(0,0,0,0.3)" }}>
+          <div className="h-full rounded-full transition-all duration-500"
+            style={{
+              width: `${pct}%`,
+              background: done ? "linear-gradient(135deg, #16a34a, #15803d)" : "linear-gradient(135deg, #dc2626, #991b1b)"
+            }} />
+        </div>
+        <p className="text-center text-xs mt-1" style={{ color: "rgba(252,165,165,0.5)" }}>
+          {done ? "今日の目標達成！明日も続けよう" : `あと${goal - progress}問で目標達成`}
+        </p>
+      </div>
+
+      {/* 苦手漢字リスト */}
+      {weakCount > 0 && (
+        <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(220,38,38,0.2)" }}>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>苦手漢字: {weakCount}字</span>
+            <a href="/game" className="text-xs font-bold px-3 py-1.5 rounded-lg"
+              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>
+              復習する →
+            </a>
+          </div>
+          <p className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.5)" }}>ゲーム中に間違えた漢字を自動記録。苦手克服モードで集中練習！</p>
+        </div>
+      )}
+
+      <div className="mt-3 text-center">
+        <Link href="/game"
+          className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+          style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+          目標達成に挑戦する →
+        </Link>
+      </div>
+    </div>
+  );
+}
 
 const samples = [
   { kanji: "茨城", reading: "いばらき", level: "地名" },
   { kanji: "薔薇", reading: "ばら", level: "N2" },
   { kanji: "山葵", reading: "わさび", level: "N3" },
+  { kanji: "雪崩", reading: "なだれ", level: "N2" },
+  { kanji: "土産", reading: "みやげ", level: "N3" },
+  { kanji: "小豆", reading: "あずき", level: "N2" },
+];
+
+const JLPT_LEVELS = [
+  { level: "N5", label: "JLPT N5", desc: "基礎漢字 約100字", color: "#22c55e", questions: "200問" },
+  { level: "N4", label: "JLPT N4", desc: "初級漢字 約300字", color: "#84cc16", questions: "400問" },
+  { level: "N3", label: "JLPT N3", desc: "中級漢字 約650字", color: "#eab308", questions: "600問" },
+  { level: "N2", label: "JLPT N2", desc: "上級漢字 約1,000字", color: "#f97316", questions: "800問" },
+  { level: "N1", label: "JLPT N1", desc: "最上級漢字 約2,000字", color: "#ef4444", questions: "1,000問" },
 ];
 
 export default function HomePage() {
+  const [localBest, setLocalBest] = useState<{ easy: number; normal: number; hard: number; ta: number } | null>(null);
+  const [loginStreak, setLoginStreak] = useState(0);
+
+  useEffect(() => {
+    try {
+      setLocalBest({
+        easy: parseInt(localStorage.getItem("yomigana_best_easy") || "0"),
+        normal: parseInt(localStorage.getItem("yomigana_best_normal") || "0"),
+        hard: parseInt(localStorage.getItem("yomigana_best_hard") || "0"),
+        ta: parseInt(localStorage.getItem("yomigana_ta_best") || "0"),
+      });
+      const streakData = JSON.parse(localStorage.getItem("yomigana_streak") || "{}");
+      setLoginStreak(streakData.streak ?? 0);
+    } catch { /* noop */ }
+  }, []);
+
   return (
     <div className="min-h-screen" style={{ background: "linear-gradient(160deg, #1c1917, #292524, #1c1917)" }}>
       {/* ヒーロー — 道場テーマ */}
@@ -86,6 +227,157 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 個人成績ダッシュボード（localStorageがある場合表示） */}
+      {localBest && (localBest.easy > 0 || localBest.normal > 0 || localBest.hard > 0 || localBest.ta > 0) && (
+        <section className="py-10 px-4">
+          <div className="max-w-lg mx-auto">
+            <h2 className="text-center text-lg font-black mb-2" style={{ color: "#fca5a5" }}>
+              🏆 あなたの成績
+              {loginStreak >= 2 && <span className="ml-2 text-sm font-bold" style={{ color: "#fbbf24" }}>🔥 {loginStreak}日連続</span>}
+            </h2>
+            <p className="text-center text-xs mb-5" style={{ color: "rgba(252,165,165,0.5)" }}>このブラウザに保存された自己ベスト</p>
+            <div className="grid grid-cols-2 gap-3">
+              {[
+                { label: "🟢 かんたん", value: localBest.easy, unit: "問" },
+                { label: "🟡 ふつう", value: localBest.normal, unit: "問" },
+                { label: "🔴 むずかしい", value: localBest.hard, unit: "問" },
+                { label: "⚡ タイムアタック", value: localBest.ta, unit: "問/60s" },
+              ].map((item) => (
+                <div key={item.label} className="rounded-2xl p-4 text-center"
+                  style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.25)" }}>
+                  <div className="text-xs mb-1" style={{ color: "rgba(252,165,165,0.7)" }}>{item.label}</div>
+                  <div className="text-3xl font-black" style={{ color: item.value > 0 ? "#fca5a5" : "#78716c" }}>
+                    {item.value > 0 ? item.value : "—"}
+                  </div>
+                  {item.value > 0 && <div className="text-xs" style={{ color: "rgba(252,165,165,0.5)" }}>{item.unit}</div>}
+                </div>
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <Link href="/game"
+                className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+                style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+                記録を更新する →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* JLPT対応レベルガイド */}
+      <section className="py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-center text-lg font-black mb-2" style={{ color: "#fca5a5" }}>JLPT対応レベル</h2>
+          <p className="text-center text-xs mb-6" style={{ color: "rgba(252,165,165,0.5)" }}>N5（初級）からN1（最上級）まで段階的に学習できます</p>
+          <div className="space-y-2">
+            {JLPT_LEVELS.map((lv) => (
+              <div key={lv.level} className="flex items-center gap-3 rounded-xl px-4 py-3"
+                style={{ background: "rgba(68,64,60,0.4)", border: "1px solid rgba(120,113,108,0.3)" }}>
+                <div className="w-14 h-6 rounded-full flex items-center justify-center text-xs font-black flex-shrink-0"
+                  style={{ background: lv.color + "33", color: lv.color, border: `1px solid ${lv.color}88` }}>
+                  {lv.level}
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold" style={{ color: "#e7e5e4" }}>{lv.desc}</div>
+                </div>
+                <div className="text-xs font-bold" style={{ color: "rgba(120,113,108,0.8)" }}>{lv.questions}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 rounded-xl p-3 text-xs text-center"
+            style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", color: "rgba(252,165,165,0.7)" }}>
+            📚 無料: N5問題（一部） | プレミアム: 全5レベル 3,000問以上
+          </div>
+        </div>
+      </section>
+
+      {/* 1日の目標設定 + 苦手漢字リスト */}
+      <section className="py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <DailyGoalSection />
+        </div>
+      </section>
+
+      {/* 学年別モード */}
+      <section className="py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-center text-lg font-black mb-2" style={{ color: "#fca5a5" }}>学年別モード</h2>
+          <p className="text-center text-xs mb-6" style={{ color: "rgba(252,165,165,0.5)" }}>あなたのレベルにぴったりの問題を選ぼう</p>
+          <div className="space-y-2">
+            {[
+              { grade: "小学1〜2年生", emoji: "🌱", kanji: "山・川・空・犬・花など", desc: "ひらがなを覚えた後の最初の漢字", levels: "N5" },
+              { grade: "小学3〜4年生", emoji: "📘", kanji: "温度・感情・都市名など", desc: "日常生活でよく見る中級漢字", levels: "N4/N3" },
+              { grade: "小学5〜6年生", emoji: "⚔️", kanji: "茨城・蒲公英・土産など", desc: "難読漢字・地名・熟語チャレンジ", levels: "N2" },
+              { grade: "中学生〜大人", emoji: "👑", kanji: "薔薇・山葵・金剛など", desc: "大人でも読めない超難読漢字", levels: "N1/人名" },
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer hover:opacity-80 transition-opacity"
+                style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
+                <span className="text-2xl shrink-0">{item.emoji}</span>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-black" style={{ color: "#fca5a5" }}>{item.grade}</span>
+                    <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>{item.levels}</span>
+                  </div>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.7)" }}>例: {item.kanji}</p>
+                  <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.45)" }}>{item.desc}</p>
+                </div>
+                <a href="/game" className="text-xs font-bold px-3 py-1.5 rounded-lg shrink-0"
+                  style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+                  挑戦 →
+                </a>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 text-center">
+            <a href="/game"
+              className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+              style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+              今日の目標10問に挑戦する →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* グローバルランキング風（固定表示） */}
+      <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)" }}>
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-center text-lg font-black mb-5" style={{ color: "#fca5a5" }}>🏅 ベストプレイヤー（参考例）</h2>
+          <div className="space-y-2">
+            {[
+              { rank: 1, name: "漢字博士", score: "タイムアタック 31問", badge: "👑 名人", color: "#fbbf24" },
+              { rank: 2, name: "難読マスター", score: "通常モード 全問正解", badge: "⚔️ 五段", color: "#f97316" },
+              { rank: 3, name: "漢字スプリンター", score: "タイムアタック 28問", badge: "⚔️ 三段", color: "#ef4444" },
+              { rank: 4, name: "文字の達人", score: "通常モード 9/10問", badge: "🥋 初段", color: "#a78bfa" },
+            ].map((player) => (
+              <div key={player.rank} className="flex items-center gap-3 rounded-xl px-4 py-3"
+                style={{ background: "rgba(68,64,60,0.4)", border: `1px solid rgba(${player.rank === 1 ? "251,191,36" : "120,113,108"},0.3)` }}>
+                <div className="text-lg font-black w-6 text-center" style={{ color: player.rank <= 3 ? player.color : "#78716c" }}>
+                  {player.rank <= 3 ? ["🥇","🥈","🥉"][player.rank - 1] : player.rank}
+                </div>
+                <div className="flex-1">
+                  <div className="text-sm font-bold" style={{ color: "#e7e5e4" }}>{player.name}</div>
+                  <div className="text-xs" style={{ color: "rgba(120,113,108,0.7)" }}>{player.score}</div>
+                </div>
+                <div className="text-xs font-bold px-2 py-1 rounded-full"
+                  style={{ background: player.color + "22", color: player.color, border: `1px solid ${player.color}44` }}>
+                  {player.badge}
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>
+            ※ 掲載はサンプル表示です。あなたのスコアをXでシェアしてランクを自慢しよう！
+          </p>
+          <div className="mt-4 text-center">
+            <Link href="/game"
+              className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
+              style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
+              ランキングに挑戦 →
+            </Link>
           </div>
         </div>
       </section>
