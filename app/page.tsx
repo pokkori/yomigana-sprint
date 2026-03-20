@@ -274,6 +274,30 @@ export default function HomePage() {
         </section>
       )}
 
+      {/* 難読漢字ガイドへの誘導 */}
+      <section className="py-8 px-4">
+        <div className="max-w-lg mx-auto">
+          <div className="rounded-2xl p-5"
+            style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">📖</span>
+              <div>
+                <h2 className="font-black text-sm" style={{ color: "#fca5a5" }}>難読漢字 完全ガイド</h2>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.6)" }}>薔薇・山葵・蒲公英…由来・覚え方まで解説</p>
+              </div>
+            </div>
+            <p className="text-xs mb-4 leading-relaxed" style={{ color: "rgba(252,165,165,0.7)" }}>
+              食材・植物・動物・地名・日常語の5カテゴリで難読漢字を徹底解説。読み方だけでなく漢字の由来・語源まで学べます。
+            </p>
+            <Link href="/study"
+              className="inline-block text-xs font-bold py-2 px-5 rounded-xl"
+              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}>
+              難読漢字ガイドを読む →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* JLPT対応レベルガイド */}
       <section className="py-12 px-4">
         <div className="max-w-lg mx-auto">
