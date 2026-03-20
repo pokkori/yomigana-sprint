@@ -194,6 +194,29 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* 難読漢字の実態データ */}
+      <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.25)", borderBottom: "1px solid rgba(220,38,38,0.2)" }}>
+        <div className="max-w-lg mx-auto">
+          <p className="text-center text-xs mb-4 font-bold tracking-widest" style={{ color: "rgba(252,165,165,0.6)" }}>難読漢字の実態</p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { num: "2,136字", label: "常用漢字の数", sub: "文部科学省" },
+              { num: "約30%", label: "読み間違い率（一般）", sub: "読み仮名調査" },
+              { num: "N1取得率\n約30%", label: "JLPT N1合格率", sub: "日本語能力試験" },
+              { num: "茨城・岐阜\n読める？", label: "都道府県難読地名", sub: "地名研究" },
+            ].map((stat) => (
+              <div key={stat.label} className="rounded-2xl p-4 text-center"
+                style={{ background: "rgba(68,64,60,0.5)", border: "1px solid rgba(220,38,38,0.2)" }}>
+                <div className="text-base font-black mb-1 whitespace-pre-line leading-tight" style={{ color: "#fca5a5" }}>{stat.num}</div>
+                <div className="text-xs font-bold mb-0.5" style={{ color: "#e7e5e4" }}>{stat.label}</div>
+                <div className="text-xs" style={{ color: "rgba(120,113,108,0.7)" }}>{stat.sub}</div>
+              </div>
+            ))}
+          </div>
+          <p className="text-center text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>※参考値・概算です</p>
+        </div>
+      </section>
+
       {/* 段位プレビュー */}
       <section className="py-12 px-4">
         <div className="max-w-lg mx-auto">
