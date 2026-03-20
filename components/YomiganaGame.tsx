@@ -138,6 +138,39 @@ const TA_BEST_KEY = "yomigana_ta_best";
 const DIFFICULTY_KEY = "yomigana_difficulty";
 const WEAK_LIST_KEY = "yomigana_weak_list";
 const VOICE_KEY = "yomigana_voice_enabled";
+const STREAK_FREEZE_KEY = "yomigana_streak_freeze";
+
+// ─── Streak Freeze（Duolingo型継続設計） ────────────────────────────────────
+function getStreakFreezeCount(): number {
+  try { return parseInt(localStorage.getItem(STREAK_FREEZE_KEY) ?? "0", 10) || 0; } catch { return 0; }
+}
+function saveStreakFreezeCount(n: number) {
+  try { localStorage.setItem(STREAK_FREEZE_KEY, String(Math.max(0, n))); } catch { /* noop */ }
+}
+// ストリークがリセット寸前の状態（昨日からデータが来ていない）かを確認
+function isStreakAtRisk(): boolean {
+  try {
+    const data = JSON.parse(localStorage.getItem("yomigana_streak") ?? "{}");
+    const today = new Date().toISOString().slice(0, 10);
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    // 最後プレイが昨日より前 = リスクあり（でも今日まだプレイしていない）
+    if (!data.lastDate) return false;
+    return data.lastDate !== today && data.lastDate !== yesterday && data.streak >= 3;
+  } catch { return false; }
+}
+// Streak Freezeを使ってストリークを保護する
+function applyStreakFreeze(): boolean {
+  const count = getStreakFreezeCount();
+  if (count <= 0) return false;
+  saveStreakFreezeCount(count - 1);
+  // ストリークのlastDateを昨日に更新して連続を維持
+  try {
+    const data = JSON.parse(localStorage.getItem("yomigana_streak") ?? "{}");
+    const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+    localStorage.setItem("yomigana_streak", JSON.stringify({ ...data, lastDate: yesterday }));
+  } catch { /* noop */ }
+  return true;
+}
 
 function getSavedVoice(): boolean {
   try { return localStorage.getItem(VOICE_KEY) !== "0"; } catch { return true; }
@@ -306,6 +339,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [weakList, setWeakList] = useState<WeakItem[]>([]);
   const [resultTab, setResultTab] = useState<"result" | "weak">("result");
   const [voiceEnabled, setVoiceEnabled] = useState(true);
+  // Wordle式グリッド用: 各問の正誤を記録
+  const [questionResults, setQuestionResults] = useState<boolean[]>([]);
+  // Streak Freeze
+  const [streakFreezeCount, setStreakFreezeCount] = useState(0);
+  const [streakAtRisk, setStreakAtRisk] = useState(false);
+  const [freezeApplied, setFreezeApplied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -323,6 +362,9 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       setShowLoginStreakBanner(true);
       setTimeout(() => setShowLoginStreakBanner(false), 3000);
     }
+    // Streak Freeze初期化
+    setStreakFreezeCount(getStreakFreezeCount());
+    setStreakAtRisk(isStreakAtRisk());
   }, []);
 
   // 難易度変更時に問題セットを更新
@@ -366,6 +408,10 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     setSelected(choice);
     setIsCorrect(correct);
     setPhase("answered");
+    // Wordle式グリッド用に正誤を記録（通常モードのみ）
+    if (gameMode === "normal") {
+      setQuestionResults(prev => [...prev, correct]);
+    }
     if (correct) {
       const newStreak = streak + 1;
       setScore(s => s + 100 + streak * 10);
@@ -456,6 +502,43 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             </div>
           )}
 
+          {/* Streak Freeze バナー */}
+          {streakAtRisk && loginStreak >= 3 && (
+            <div className="mb-4 rounded-xl p-3" style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.4)" }}>
+              <p className="text-xs font-black mb-1" style={{ color: "#fca5a5" }}>⚠️ {loginStreak}日連続のストリークが危険！</p>
+              {streakFreezeCount > 0 ? (
+                <div className="flex items-center justify-between">
+                  <p className="text-xs" style={{ color: "rgba(252,165,165,0.7)" }}>
+                    ストリークフリーズを使ってストリークを守れます（残り{streakFreezeCount}回）
+                  </p>
+                  <button
+                    onClick={() => {
+                      const ok = applyStreakFreeze();
+                      if (ok) {
+                        setStreakFreezeCount(getStreakFreezeCount());
+                        setStreakAtRisk(false);
+                        setFreezeApplied(true);
+                      }
+                    }}
+                    className="text-xs font-black px-3 py-1.5 rounded-full ml-2 shrink-0"
+                    style={{ background: "rgba(239,68,68,0.3)", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.6)" }}
+                  >
+                    🧊 フリーズ使用
+                  </button>
+                </div>
+              ) : (
+                <p className="text-xs" style={{ color: "rgba(252,165,165,0.5)" }}>
+                  今日プレイするとストリークを維持できます！
+                </p>
+              )}
+            </div>
+          )}
+          {freezeApplied && (
+            <div className="mb-3 text-center text-xs font-black animate-bounce" style={{ color: "#34d399" }}>
+              🧊 ストリークフリーズ発動！ストリークを守りました！
+            </div>
+          )}
+
           {/* 音声読み上げトグル */}
           <div className="flex items-center justify-center gap-2 mb-5">
             <button
@@ -511,6 +594,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                 setScore(0);
                 setStreak(0);
                 setDiffNewRecord(false);
+                setQuestionResults([]);
                 setPhase("playing");
               }}
               className="w-full p-5 rounded-2xl text-left transition-all active:scale-95"
@@ -715,7 +799,54 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                   </div>
                 </div>
               )}
+              {/* Streak Freeze獲得（全問正解ボーナス） */}
+              {correctCount === total && total >= 5 && (
+                <div className="rounded-xl p-3 mb-3" style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.4)" }}>
+                  <p className="text-xs font-black mb-1" style={{ color: "#38bdf8" }}>🧊 ストリークフリーズ獲得！</p>
+                  <p className="text-xs mb-2" style={{ color: "rgba(56,189,248,0.7)" }}>
+                    全問正解ボーナス！ストリークフリーズが1個追加されました。<br />
+                    万が一プレイできない日があってもストリークを守れます。
+                  </p>
+                  <p className="text-xs font-bold" style={{ color: "#38bdf8" }}>
+                    🧊 残りフリーズ: {streakFreezeCount + 1}個
+                  </p>
+                  {typeof window !== "undefined" && (() => {
+                    // 付与処理（表示と同時に実行）
+                    const newCount = getStreakFreezeCount() + 1;
+                    // 重複付与防止: todayキーで管理
+                    const todayKey = `yomigana_freeze_awarded_${new Date().toISOString().slice(0, 10)}`;
+                    if (!localStorage.getItem(todayKey)) {
+                      saveStreakFreezeCount(newCount);
+                      localStorage.setItem(todayKey, "1");
+                    }
+                    return null;
+                  })()}
+                </div>
+              )}
               <CertificateButton score={score} diffLabel={diffCfg.label} />
+              {/* Wordle式グリッドシェア */}
+              {questionResults.length > 0 && (
+                <div className="rounded-2xl p-4 mb-3" style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.3)" }}>
+                  <p className="text-center text-xs font-bold mb-2" style={{ color: "#fca5a5" }}>📊 今日の結果グリッド</p>
+                  <div className="text-center text-2xl tracking-widest mb-3 leading-relaxed">
+                    {questionResults.map(r => r ? '🟩' : '🟥').join('')}
+                  </div>
+                  <button
+                    onClick={() => {
+                      const grid = questionResults.map(r => r ? '🟩' : '🟥').join('');
+                      const correctN = questionResults.filter(Boolean).length;
+                      const text = `今日の難読漢字 ${correctN}/${questionResults.length}\n${grid}\n#読み仮名スプリント`;
+                      const url = 'https://yomigana-sprint.vercel.app';
+                      window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+                    }}
+                    className="flex items-center justify-center gap-2 w-full font-bold py-2.5 rounded-xl text-sm active:scale-95 transition-transform"
+                    style={{ background: "#18181b", color: "#fff" }}
+                  >
+                    <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    今日の結果をXでシェア
+                  </button>
+                </div>
+              )}
               <a href={tweetUrl} target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2 w-full font-bold px-8 py-3 rounded-2xl text-lg mb-3 transition-all active:scale-95"
@@ -725,7 +856,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                 </svg>
                 {danLevel.rank}をXで自慢する {danLevel.badge}
               </a>
-              <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
+              <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setQuestionResults([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
                 className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg"
                 style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
                 🥋 もう一度挑戦！
@@ -771,7 +902,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                   </p>
                 </>
               )}
-              <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
+              <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setQuestionResults([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
                 className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg mt-4"
                 style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
                 🥋 もう一度挑戦！
