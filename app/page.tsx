@@ -659,7 +659,7 @@ export default function HomePage() {
           ))}
         </div>
         <div className="flex flex-col gap-2 mt-5">
-          <a href="https://twitter.com/intent/tweet?text=%E8%AA%AD%E3%81%BF%E4%BB%AE%E5%90%8D%E3%82%B9%E3%83%97%E3%83%AA%E3%83%B3%E3%83%88%E3%81%A7%E9%9B%A3%E8%AA%AD%E6%BC%A2%E5%AD%97%E3%81%AB%E6%8C%91%E6%88%A6%E3%81%97%E3%81%9F%EF%BC%81%F0%9F%A5%8B%20%23%E8%AA%AD%E3%81%BF%E4%BB%AE%E5%90%8D%20%23%E9%9B%A3%E8%AA%AD%E6%BC%A2%E5%AD%97%20https%3A%2F%2Fyomigana-sprint.vercel.app" target="_blank" rel="noopener noreferrer"
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("【読み仮名スプリント】難読漢字に挑戦！🥋 薔薇・茨城・山葵…あなたは全部読める？ゲームで漢字力を試そう！ #難読漢字 #漢字クイズ #読み仮名スプリント")}&url=${encodeURIComponent("https://yomigana-sprint.vercel.app")}`} target="_blank" rel="noopener noreferrer"
             className="flex items-center justify-center gap-2 text-sm font-bold py-2.5 px-6 rounded-xl transition-colors w-full"
             style={{ background: "#18181b", color: "#fff" }}>
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -696,6 +696,95 @@ export default function HomePage() {
             <span style={{ color: "#6ee7b7", fontWeight: "700", fontSize: "11px", background: "rgba(6,78,59,0.5)", border: "1px solid rgba(16,185,129,0.4)", padding: "4px 8px", borderRadius: "999px", whiteSpace: "nowrap", marginLeft: "8px" }}>詳細を見る →</span>
           </a>
           <p style={{ color: "rgba(52,211,153,0.45)", fontSize: "11px", textAlign: "center", marginTop: "8px" }}>※ 広告・PR掲載</p>
+        </div>
+      </section>
+
+      {/* 学習レポートへの導線 */}
+      <section className="py-10 px-4">
+        <div className="max-w-lg mx-auto">
+          <div className="rounded-2xl p-5"
+            style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">📊</span>
+              <div>
+                <h2 className="font-black text-sm" style={{ color: "#fca5a5" }}>学習レポートを確認する</h2>
+                <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.6)" }}>今週の正解数・苦手カテゴリ・連続学習日数を確認</p>
+              </div>
+            </div>
+            <p className="text-xs mb-4 leading-relaxed" style={{ color: "rgba(252,165,165,0.7)" }}>
+              過去7日間の学習グラフ・難易度別ベストスコア・苦手漢字ランキングを一覧表示。弱点を把握して効率よく漢字力を伸ばそう。
+            </p>
+            <Link href="/report"
+              className="inline-block text-xs font-bold py-2 px-5 rounded-xl"
+              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}>
+              学習レポートを見る →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* SEOテキスト: 読み仮名の効率的な覚え方 */}
+      <section className="py-12 px-4" style={{ background: "rgba(0,0,0,0.15)" }}>
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-xl font-black mb-4" style={{ color: "#fca5a5" }}>読み仮名の効率的な覚え方</h2>
+          <div className="space-y-4 text-sm leading-relaxed" style={{ color: "rgba(252,165,165,0.8)" }}>
+            <p>
+              読み仮名・難読漢字を効率よく覚えるには<strong style={{ color: "#fca5a5" }}>「反復×ゲーム」の組み合わせ</strong>が最も効果的です。
+              漢字研究によれば、1回書いて覚えるより、クイズ形式で繰り返し「思い出す」練習のほうが記憶定着率が2〜3倍高いと言われています。
+            </p>
+            <p>
+              <strong style={{ color: "#fca5a5" }}>苦手漢字は自動記録・復習</strong>できるので、間違えた漢字だけを集中して練習することも可能。
+              毎日10問の習慣（5分）を続けるだけで、1ヵ月で300問以上の難読漢字をマスターできます。
+            </p>
+            <div className="rounded-xl p-4 mt-2" style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)" }}>
+              <p className="font-bold text-xs mb-2" style={{ color: "#fca5a5" }}>効率的な学習の3ステップ</p>
+              <ol className="space-y-1 text-xs" style={{ color: "rgba(252,165,165,0.75)" }}>
+                <li>1. 今日の10問にチャレンジ（5分）</li>
+                <li>2. 間違えた漢字を「苦手リスト」で確認</li>
+                <li>3. 翌日、苦手漢字を重点的に復習</li>
+              </ol>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SEOテキスト: このアプリの特徴 */}
+      <section className="py-12 px-4">
+        <div className="max-w-lg mx-auto">
+          <h2 className="text-xl font-black mb-4" style={{ color: "#fca5a5" }}>読み仮名スプリントの特徴</h2>
+          <div className="space-y-4">
+            {[
+              {
+                icon: "🥋",
+                title: "段位制でモチベーションが続く",
+                desc: "初段・三段・五段・名人と段位が上がる仕組み。連続正解でボーナス点が入り、ゲーム感覚で続けられます。",
+              },
+              {
+                icon: "📖",
+                title: "苦手漢字を自動記録・復習",
+                desc: "間違えた漢字は自動で「苦手リスト」に保存。あとで集中練習できるので、弱点を確実に克服できます。",
+              },
+              {
+                icon: "⚡",
+                title: "タイムアタックで速読力強化",
+                desc: "60秒で何問解けるか競うタイムアタックモード。瞬時に読み方を判断する速読力が身につきます。",
+              },
+              {
+                icon: "📊",
+                title: "学習レポートで進捗を可視化",
+                desc: "過去7日間の学習グラフ・苦手カテゴリ・連続学習日数を一覧表示。自分の成長が一目でわかります。",
+              },
+            ].map((item, i) => (
+              <div key={i} className="flex gap-4 rounded-xl p-4"
+                style={{ background: "rgba(68,64,60,0.4)", border: "1px solid rgba(220,38,38,0.15)" }}>
+                <span className="text-2xl shrink-0">{item.icon}</span>
+                <div>
+                  <h3 className="font-black text-sm mb-1" style={{ color: "#fca5a5" }}>{item.title}</h3>
+                  <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.7)" }}>{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
