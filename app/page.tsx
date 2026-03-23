@@ -214,7 +214,7 @@ function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
   };
 
   return (
-    <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "20px", padding: "20px" }}>
+    <div style={{ background: "rgba(251,191,36,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "20px", padding: "20px" }}>
       <div className="flex items-center gap-2 mb-1">
         <span className="text-xl">📅</span>
         <h2 className="text-lg font-black" style={{ color: "#fbbf24" }}>今日の挑戦漢字</h2>
@@ -366,7 +366,7 @@ function DailyGoalSection() {
   const done = progress >= goal;
 
   return (
-    <div style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)", borderRadius: "20px", padding: "20px" }}>
+    <div style={{ background: "rgba(220,38,38,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(220,38,38,0.25)", borderRadius: "20px", padding: "20px" }}>
       <h2 className="text-center text-lg font-black mb-4" style={{ color: "#fca5a5" }}>今日の目標</h2>
 
       {/* 目標設定 */}
@@ -685,7 +685,7 @@ export default function HomePage() {
       <section className="py-8 px-4">
         <div className="max-w-lg mx-auto">
           <div className="rounded-2xl p-5"
-            style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}>
+            style={{ background: "rgba(220,38,38,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(220,38,38,0.25)" }}>
             <div className="flex items-center gap-3 mb-3">
               <span className="text-2xl">📖</span>
               <div>
@@ -872,7 +872,7 @@ export default function HomePage() {
           <h2 className="text-xl font-black text-center mb-6" style={{ color: "#e7e5e4" }}>料金プラン</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="rounded-2xl p-6"
-              style={{ background: "rgba(68,64,60,0.5)", border: "1px solid rgba(120,113,108,0.4)" }}>
+              style={{ background: "rgba(68,64,60,0.5)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(120,113,108,0.4)" }}>
               <p className="font-black text-base mb-1" style={{ color: "#d6d3d1" }}>無料</p>
               <p className="text-3xl font-black mb-4" style={{ color: "#fff" }}>¥0</p>
               <ul className="text-sm space-y-2" style={{ color: "#a8a29e" }}>
@@ -882,7 +882,7 @@ export default function HomePage() {
               </ul>
             </div>
             <div className="rounded-2xl p-6"
-              style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.3), rgba(153,27,27,0.3))", border: "2px solid rgba(220,38,38,0.5)" }}>
+              style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.3), rgba(153,27,27,0.3))", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "2px solid rgba(220,38,38,0.5)" }}>
               <p className="font-black text-base mb-1" style={{ color: "#fca5a5" }}>プレミアム</p>
               <div style={{ display: "inline-block", background: "#16a34a", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "2px 10px", borderRadius: "999px", marginBottom: "8px" }}>🛡️ 30日返金保証</div>
               <p className="text-3xl font-black mb-4" style={{ color: "#fff" }}>¥480<span className="text-sm font-normal" style={{ color: "#fca5a5" }}>/月</span></p>
@@ -1087,7 +1087,7 @@ export default function HomePage() {
       <section className="py-10 px-4">
         <div className="max-w-lg mx-auto">
           <div className="rounded-2xl p-5"
-            style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.25)" }}>
+            style={{ background: "rgba(220,38,38,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(220,38,38,0.25)" }}>
             <div className="flex items-center gap-3 mb-3">
               <span className="text-2xl">📊</span>
               <div>
