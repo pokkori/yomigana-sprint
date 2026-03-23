@@ -1,7 +1,137 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+
+// ─── Streak管理 ──────────────────────────────────────────────────────────
+const STREAK_KEY = "yomigana_daily_streak";
+
+interface StreakData {
+  streak: number;
+  lastDate: string;
+  title: string;
+  prevTitle: string;
+}
+
+function getStreakData(): StreakData {
+  try {
+    const raw = localStorage.getItem(STREAK_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch { /* noop */ }
+  return { streak: 0, lastDate: "", title: "", prevTitle: "" };
+}
+
+function getTitle(streak: number): string {
+  if (streak >= 30) return "漢字の達人";
+  if (streak >= 7) return "漢字マスター";
+  return "";
+}
+
+function updateStreak(): { data: StreakData; titleChanged: boolean } {
+  const today = new Date().toISOString().slice(0, 10);
+  const prev = getStreakData();
+  if (prev.lastDate === today) return { data: prev, titleChanged: false };
+
+  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
+  const newStreak = prev.lastDate === yesterday ? prev.streak + 1 : 1;
+  const newTitle = getTitle(newStreak);
+  const titleChanged = newTitle !== "" && newTitle !== prev.title;
+  const data: StreakData = {
+    streak: newStreak,
+    lastDate: today,
+    title: newTitle,
+    prevTitle: prev.title,
+  };
+  try { localStorage.setItem(STREAK_KEY, JSON.stringify(data)); } catch { /* noop */ }
+  return { data, titleChanged };
+}
+
+// ─── Confetti CSSアニメーション ───────────────────────────────────────────
+function ConfettiOverlay({ onDone }: { onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 3000);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  const colors = ["#fbbf24", "#dc2626", "#22c55e", "#3b82f6", "#a855f7", "#f97316"];
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {Array.from({ length: 40 }).map((_, i) => {
+        const left = Math.random() * 100;
+        const delay = Math.random() * 1.5;
+        const duration = 2 + Math.random() * 1.5;
+        const color = colors[i % colors.length];
+        const size = 6 + Math.random() * 6;
+        return (
+          <div
+            key={i}
+            style={{
+              position: "absolute",
+              left: `${left}%`,
+              top: "-20px",
+              width: `${size}px`,
+              height: `${size}px`,
+              background: color,
+              borderRadius: Math.random() > 0.5 ? "50%" : "2px",
+              animation: `confettiFall ${duration}s ease-in ${delay}s forwards`,
+              opacity: 0,
+            }}
+          />
+        );
+      })}
+      <style>{`
+        @keyframes confettiFall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(${360 + Math.random() * 360}deg); opacity: 0; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
+// ─── Streakバッジコンポーネント ────────────────────────────────────────────
+function StreakBadge() {
+  const [streakData, setStreakData] = useState<StreakData | null>(null);
+
+  useEffect(() => {
+    setStreakData(getStreakData());
+  }, []);
+
+  if (!streakData || streakData.streak < 1) return null;
+  const title = getTitle(streakData.streak);
+
+  return (
+    <div className="flex items-center justify-center gap-2 flex-wrap">
+      <span
+        className="inline-flex items-center gap-1.5 text-sm font-black px-4 py-2 rounded-full"
+        style={{
+          background: streakData.streak >= 30
+            ? "linear-gradient(135deg, rgba(168,85,247,0.3), rgba(139,92,246,0.3))"
+            : streakData.streak >= 7
+              ? "linear-gradient(135deg, rgba(251,191,36,0.3), rgba(245,158,11,0.3))"
+              : "rgba(220,38,38,0.2)",
+          color: streakData.streak >= 30 ? "#c084fc" : streakData.streak >= 7 ? "#fbbf24" : "#fca5a5",
+          border: `1px solid ${streakData.streak >= 30 ? "rgba(168,85,247,0.5)" : streakData.streak >= 7 ? "rgba(251,191,36,0.5)" : "rgba(220,38,38,0.4)"}`,
+          boxShadow: streakData.streak >= 7 ? `0 0 16px ${streakData.streak >= 30 ? "rgba(168,85,247,0.3)" : "rgba(251,191,36,0.3)"}` : "none",
+        }}
+      >
+        🔥 連続正解: {streakData.streak}日
+      </span>
+      {title && (
+        <span
+          className="inline-flex items-center gap-1 text-xs font-black px-3 py-1.5 rounded-full"
+          style={{
+            background: streakData.streak >= 30 ? "rgba(168,85,247,0.25)" : "rgba(251,191,36,0.25)",
+            color: streakData.streak >= 30 ? "#c084fc" : "#fbbf24",
+            border: `1px solid ${streakData.streak >= 30 ? "rgba(168,85,247,0.5)" : "rgba(251,191,36,0.5)"}`,
+          }}
+        >
+          {streakData.streak >= 30 ? "👑" : "⚡"} {title}
+        </span>
+      )}
+    </div>
+  );
+}
 
 // ─── 今日の一問 Wordle方式 ─────────────────────────────────────────────────
 const DAILY_QUIZ_POOL = [
@@ -38,26 +168,50 @@ function getTodayQuiz() {
   return DAILY_QUIZ_POOL[hash % DAILY_QUIZ_POOL.length];
 }
 
-function DailyWordleSection() {
+function getDayNumber(): number {
+  const start = new Date("2026-01-01").getTime();
+  const now = Date.now();
+  return Math.floor((now - start) / 86400000) + 1;
+}
+
+function buildGrid(attempts: number): string {
+  if (attempts <= 1) return "🟩";
+  return "🟥".repeat(attempts - 1) + "🟩";
+}
+
+function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
   const quiz = getTodayQuiz();
   const [input, setInput] = useState("");
   const [result, setResult] = useState<"idle" | "correct" | "wrong">("idle");
   const [showAnswer, setShowAnswer] = useState(false);
   const [attempts, setAttempts] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   const handleSubmit = () => {
     const normalized = input.trim().replace(/\s/g, "");
     if (!normalized) return;
-    setAttempts(a => a + 1);
+    const newAttempts = attempts + 1;
+    setAttempts(newAttempts);
     if (normalized === quiz.reading) {
       setResult("correct");
+      onCorrect();
     } else {
       setResult("wrong");
     }
   };
 
-  const shareText = `今日の漢字「${quiz.kanji}」の読み方がわかった！答えは「${quiz.reading}」 #読み仮名スプリント #難読漢字`;
-  const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent("https://yomigana-sprint.vercel.app")}`;
+  const dayNum = getDayNumber();
+  const grid = result === "correct" ? buildGrid(attempts) : "";
+  const gridShareText = `読み仮名スプリント #${dayNum}\n${grid}\n漢字「${quiz.kanji}」\nyomigana-sprint.vercel.app`;
+  const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(gridShareText)}`;
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(gridShareText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* noop */ }
+  };
 
   return (
     <div style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "20px", padding: "20px" }}>
@@ -84,12 +238,14 @@ function DailyWordleSection() {
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && handleSubmit()}
             placeholder="ひらがなで入力"
+            aria-label="漢字の読み方をひらがなで入力"
             className="flex-1 rounded-xl px-4 py-2.5 text-sm font-bold"
             style={{ background: "rgba(0,0,0,0.3)", color: "#fff", border: "1px solid rgba(251,191,36,0.4)", outline: "none" }}
           />
           <button
             onClick={handleSubmit}
-            className="px-5 py-2.5 rounded-xl font-black text-sm active:scale-95 transition-transform"
+            className="px-5 py-2.5 rounded-xl font-black text-sm active:scale-95 transition-transform min-h-[44px]"
+            aria-label="読み方を判定する"
             style={{ background: "linear-gradient(135deg, #d97706, #92400e)", color: "#fff" }}
           >
             判定
@@ -104,14 +260,16 @@ function DailyWordleSection() {
           <div className="flex gap-2 justify-center">
             <button
               onClick={() => { setInput(""); setResult("idle"); }}
-              className="px-5 py-2 rounded-xl font-black text-sm active:scale-95"
+              className="px-5 py-2 rounded-xl font-black text-sm active:scale-95 min-h-[44px]"
+              aria-label="もう一度読み方を入力して再挑戦する"
               style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}
             >
               再挑戦
             </button>
             <button
               onClick={() => setShowAnswer(true)}
-              className="px-5 py-2 rounded-xl font-black text-sm active:scale-95"
+              className="px-5 py-2 rounded-xl font-black text-sm active:scale-95 min-h-[44px]"
+              aria-label="正解の読み方を表示する"
               style={{ background: "rgba(68,64,60,0.5)", color: "#a8a29e", border: "1px solid rgba(120,113,108,0.4)" }}
             >
               答えを見る
@@ -137,13 +295,35 @@ function DailyWordleSection() {
         <div className="text-center">
           <p className="text-4xl mb-2">🎉</p>
           <p className="font-black text-lg mb-1" style={{ color: "#fbbf24" }}>正解！</p>
-          <p className="text-sm mb-4" style={{ color: "rgba(251,191,36,0.7)" }}>{quiz.kanji} = {quiz.reading}{attempts > 1 ? `（${attempts}回目で正解）` : "（一発正解！）"}</p>
-          <a href={tweetUrl} target="_blank" rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl font-black text-sm active:scale-95"
-            style={{ background: "#18181b", color: "#fff" }}>
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            正解をXでシェア！
-          </a>
+          <p className="text-sm mb-2" style={{ color: "rgba(251,191,36,0.7)" }}>{quiz.kanji} = {quiz.reading}{attempts > 1 ? `（${attempts}回目で正解）` : "（一発正解！）"}</p>
+
+          {/* Wordleグリッド表示 */}
+          <div className="rounded-xl p-3 mb-4 mx-auto max-w-xs" style={{ background: "rgba(0,0,0,0.3)", border: "1px solid rgba(251,191,36,0.3)" }}>
+            <p className="text-xs font-bold mb-1" style={{ color: "rgba(251,191,36,0.6)" }}>読み仮名スプリント #{dayNum}</p>
+            <p className="text-2xl mb-1 tracking-wider">{grid}</p>
+            <p className="text-xs" style={{ color: "rgba(251,191,36,0.5)" }}>漢字「{quiz.kanji}」</p>
+          </div>
+
+          {/* シェアボタン */}
+          <div className="flex gap-2 justify-center flex-wrap">
+            <button
+              onClick={handleCopy}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-sm active:scale-95 transition-all min-h-[44px]"
+              aria-label={copied ? "結果をクリップボードにコピーしました" : "今日の結果をクリップボードにコピーする"}
+              style={{
+                background: copied ? "linear-gradient(135deg, #16a34a, #15803d)" : "linear-gradient(135deg, #d97706, #92400e)",
+                color: "#fff",
+              }}
+            >
+              {copied ? "コピーしました！" : "結果をコピー"}
+            </button>
+            <a href={tweetUrl} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-sm active:scale-95"
+              style={{ background: "#18181b", color: "#fff" }}>
+              <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Xでシェア
+            </a>
+          </div>
         </div>
       )}
     </div>
@@ -196,12 +376,14 @@ function DailyGoalSection() {
             <input
               type="number" min={5} max={100} value={inputVal}
               onChange={e => setInputVal(parseInt(e.target.value) || 10)}
+              aria-label="今日の目標問題数を入力（5〜100問）"
               className="w-20 text-center font-black rounded-lg px-2 py-1 text-sm border"
               style={{ background: "rgba(0,0,0,0.3)", color: "#fff", borderColor: "rgba(220,38,38,0.5)" }}
             />
             <span style={{ color: "#fca5a5", fontSize: "13px" }}>問</span>
             <button onClick={saveGoal}
-              className="text-xs font-bold px-3 py-1 rounded-lg"
+              className="text-xs font-bold px-3 py-1 rounded-lg min-h-[44px]"
+              aria-label="目標問題数を保存する"
               style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
               保存
             </button>
@@ -210,7 +392,8 @@ function DailyGoalSection() {
           <div className="flex items-center gap-2">
             <span className="text-2xl font-black" style={{ color: "#fca5a5" }}>目標: {goal}問</span>
             <button onClick={() => setEditing(true)}
-              className="text-xs px-2 py-1 rounded-lg"
+              className="text-xs px-2 py-1 rounded-lg min-h-[44px]"
+              aria-label="今日の目標問題数を変更する"
               style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>
               変更
             </button>
@@ -282,6 +465,8 @@ const JLPT_LEVELS = [
 export default function HomePage() {
   const [localBest, setLocalBest] = useState<{ easy: number; normal: number; hard: number; ta: number } | null>(null);
   const [loginStreak, setLoginStreak] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const [streakRefresh, setStreakRefresh] = useState(0);
 
   useEffect(() => {
     try {
@@ -294,6 +479,16 @@ export default function HomePage() {
       const streakData = JSON.parse(localStorage.getItem("yomigana_streak") || "{}");
       setLoginStreak(streakData.streak ?? 0);
     } catch { /* noop */ }
+  }, []);
+
+  const handleDailyCorrect = useCallback(() => {
+    const { data, titleChanged } = updateStreak();
+    setStreakRefresh(n => n + 1);
+    if (titleChanged) {
+      setShowConfetti(true);
+    }
+    // Also update loginStreak for the milestone section
+    setLoginStreak(data.streak);
   }, []);
 
   return (
@@ -379,7 +574,7 @@ export default function HomePage() {
       {/* 今日の挑戦漢字 */}
       <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)", borderBottom: "1px solid rgba(251,191,36,0.2)" }}>
         <div className="max-w-lg mx-auto">
-          <DailyWordleSection />
+          <DailyWordleSection onCorrect={() => {}} />
         </div>
       </section>
 
