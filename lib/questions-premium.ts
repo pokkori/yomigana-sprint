@@ -31,7 +31,7 @@ export const premiumQuestions: Question[] = [
   { kanji: "梅雨", correct: "つゆ", choices: ["うめあめ", "つゆ", "ばいう", "うめゆ"], level: "N3", hint: "6月の雨季" },
   { kanji: "師走", correct: "しわす", choices: ["しはしり", "しわす", "ほとけはしり", "せんせいはしり"], level: "N3", hint: "12月の別名" },
   { kanji: "弥生", correct: "やよい", choices: ["みせい", "やよい", "やいよ", "みよい"], level: "N3", hint: "3月の別名" },
-  // ─── N2/N1 難読漢字 ─────────────────────────────────────────────────────────
+  //  N2/N1 難読漢字 
   { kanji: "鰐", correct: "わに", choices: ["たに", "わに", "かに", "さに"], level: "N2", hint: "大きな爬虫類" },
   { kanji: "鶯", correct: "うぐいす", choices: ["うぐいす", "かわせみ", "つばめ", "ひばり"], level: "N2", hint: "春を告げる鳥" },
   { kanji: "蝶", correct: "ちょう", choices: ["てふ", "ちょう", "かまきり", "とんぼ"], level: "N2", hint: "花に集まる虫" },
@@ -51,7 +51,7 @@ export const premiumQuestions: Question[] = [
   { kanji: "吹雪", correct: "ふぶき", choices: ["すいゆき", "ふぶき", "ふゆき", "すいぶき"], level: "N2", hint: "猛烈な雪嵐" },
   { kanji: "雷", correct: "かみなり", choices: ["らい", "かみなり", "いなずま", "つじかぜ"], level: "N2", hint: "雷鳴と稲妻" },
   { kanji: "霞", correct: "かすみ", choices: ["きり", "かすみ", "もや", "しもやけ"], level: "N2", hint: "春の朝の靄" },
-  // ─── N1 超難読 ───────────────────────────────────────────────────────────────
+  //  N1 超難読 
   { kanji: "鰹", correct: "かつお", choices: ["まぐろ", "かつお", "かれい", "さわら"], level: "N1", hint: "出汁の代表的な魚" },
   { kanji: "鱈", correct: "たら", choices: ["さば", "たら", "ぶり", "さけ"], level: "N1", hint: "鍋料理に欠かせない魚" },
   { kanji: "鮎", correct: "あゆ", choices: ["いわな", "あゆ", "やまめ", "うぐい"], level: "N1", hint: "清流の女王と呼ばれる魚" },
@@ -76,7 +76,7 @@ export const premiumQuestions: Question[] = [
   { kanji: "鼬", correct: "いたち", choices: ["おこじょ", "いたち", "テン", "かわうそ"], level: "N1", hint: "細長い胴体の肉食獣" },
   { kanji: "河童", correct: "かっぱ", choices: ["かっぱ", "てんぐ", "おに", "もののけ"], level: "N1", hint: "水辺に棲む伝説の妖怪" },
   { kanji: "天狗", correct: "てんぐ", choices: ["てんぐ", "かっぱ", "おに", "たぬき"], level: "N1", hint: "長い鼻の山の妖怪" },
-  // ─── 地名（難読） ─────────────────────────────────────────────────────────
+  //  地名（難読） 
   { kanji: "飛騨", correct: "ひだ", choices: ["とびき", "ひだ", "ひた", "とびだ"], level: "地名", hint: "岐阜県の旧国名" },
   { kanji: "能登", correct: "のと", choices: ["のうと", "のと", "のど", "あわ"], level: "地名", hint: "石川県の半島" },
   { kanji: "甲斐", correct: "かい", choices: ["こうい", "かい", "こうがい", "かいい"], level: "地名", hint: "山梨県の旧国名" },
@@ -87,7 +87,7 @@ export const premiumQuestions: Question[] = [
   { kanji: "備前", correct: "びぜん", choices: ["びまえ", "びぜん", "びいち", "そなえまえ"], level: "地名", hint: "岡山県東部の旧国名" },
   { kanji: "薩摩", correct: "さつま", choices: ["さいも", "さつま", "さっと", "ちゅうご"], level: "地名", hint: "鹿児島県の旧国名" },
   { kanji: "肥後", correct: "ひご", choices: ["こえご", "ひご", "ひこう", "こえうしろ"], level: "地名", hint: "熊本県の旧国名" },
-  // ─── 人名（難読） ─────────────────────────────────────────────────────────
+  //  人名（難読） 
   { kanji: "一郎", correct: "いちろう", choices: ["かずろう", "いちろう", "いちお", "かつお"], level: "人名", hint: "男性の名前" },
   { kanji: "五月", correct: "さつき", choices: ["ごがつ", "さつき", "いつき", "こつき"], level: "人名", hint: "女性の名前" },
   { kanji: "小春", correct: "こはる", choices: ["こはる", "おはる", "こしゅん", "しょうはる"], level: "人名", hint: "女性の名前、秋の暖かい日も指す" },

@@ -31,14 +31,14 @@ function SuccessContent() {
 
   return (
     <div className="max-w-md w-full text-center">
-      <div className="text-6xl mb-4">🎉</div>
+      <div className="text-6xl mb-4"></div>
       <h1 className="text-3xl font-bold mb-2">プレミアム登録完了！</h1>
       <p className="text-gray-500 mb-8">全3,000問が解放されました</p>
       <div className="bg-white rounded-2xl shadow p-6 mb-6 text-left space-y-3">
         <h2 className="font-bold text-gray-700">解放された機能</h2>
-        <p>✓ 全3,000問（地名・人名・難読・JLPT）</p>
-        <p>✓ 毎日無制限プレイ</p>
-        <p>✓ ランキング機能</p>
+        <p> 全3,000問（地名・人名・難読・JLPT）</p>
+        <p> 毎日無制限プレイ</p>
+        <p> ランキング機能</p>
       </div>
       <Link href="/game" className="block w-full bg-red-600 text-white font-bold py-4 rounded-xl text-lg">
         今すぐ挑戦する →

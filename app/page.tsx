@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
 
-// ─── Streak管理 ──────────────────────────────────────────────────────────
+//  Streak管理 
 const STREAK_KEY = "yomigana_daily_streak";
 
 interface StreakData {
@@ -46,7 +46,7 @@ function updateStreak(): { data: StreakData; titleChanged: boolean } {
   return { data, titleChanged };
 }
 
-// ─── Confetti CSSアニメーション ───────────────────────────────────────────
+//  Confetti CSSアニメーション 
 function ConfettiOverlay({ onDone }: { onDone: () => void }) {
   useEffect(() => {
     const t = setTimeout(onDone, 3000);
@@ -89,7 +89,7 @@ function ConfettiOverlay({ onDone }: { onDone: () => void }) {
   );
 }
 
-// ─── Streakバッジコンポーネント ────────────────────────────────────────────
+//  Streakバッジコンポーネント 
 function StreakBadge() {
   const [streakData, setStreakData] = useState<StreakData | null>(null);
 
@@ -115,7 +115,7 @@ function StreakBadge() {
           boxShadow: streakData.streak >= 7 ? `0 0 16px ${streakData.streak >= 30 ? "rgba(168,85,247,0.3)" : "rgba(251,191,36,0.3)"}` : "none",
         }}
       >
-        🔥 連続正解: {streakData.streak}日
+         連続正解: {streakData.streak}日
       </span>
       {title && (
         <span
@@ -126,14 +126,14 @@ function StreakBadge() {
             border: `1px solid ${streakData.streak >= 30 ? "rgba(168,85,247,0.5)" : "rgba(251,191,36,0.5)"}`,
           }}
         >
-          {streakData.streak >= 30 ? "👑" : "⚡"} {title}
+          {streakData.streak >= 30 ? "" : ""} {title}
         </span>
       )}
     </div>
   );
 }
 
-// ─── 今日の一問 Wordle方式 ─────────────────────────────────────────────────
+//  今日の一問 Wordle方式 
 const DAILY_QUIZ_POOL = [
   { kanji: "茨城", reading: "いばらき", hint: "関東地方の県" },
   { kanji: "薔薇", reading: "ばら", hint: "棘がある花" },
@@ -175,8 +175,8 @@ function getDayNumber(): number {
 }
 
 function buildGrid(attempts: number): string {
-  if (attempts <= 1) return "🟩";
-  return "🟥".repeat(attempts - 1) + "🟩";
+  if (attempts <= 1) return "";
+  return "".repeat(attempts - 1) + "";
 }
 
 function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
@@ -216,7 +216,7 @@ function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
   return (
     <div style={{ background: "rgba(251,191,36,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(251,191,36,0.3)", borderRadius: "20px", padding: "20px" }}>
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-xl">📅</span>
+        <span className="text-xl"></span>
         <h2 className="text-lg font-black" style={{ color: "#fbbf24" }}>今日の挑戦漢字</h2>
         <span className="text-xs px-2 py-0.5 rounded-full font-bold" style={{ background: "rgba(251,191,36,0.2)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.4)" }}>
           全員共通
@@ -255,7 +255,7 @@ function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
 
       {result === "wrong" && !showAnswer && (
         <div className="text-center">
-          <p className="font-black text-base mb-3" style={{ color: "#fca5a5" }}>❌ 不正解…（{attempts}回目）</p>
+          <p className="font-black text-base mb-3" style={{ color: "#fca5a5" }}> 不正解…（{attempts}回目）</p>
           <p className="text-sm mb-3" style={{ color: "rgba(252,165,165,0.7)" }}>もう一度試しますか？</p>
           <div className="flex gap-2 justify-center">
             <button
@@ -283,6 +283,7 @@ function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
           <p className="text-sm mb-1" style={{ color: "rgba(251,191,36,0.7)" }}>正解は…</p>
           <p className="text-3xl font-black mb-3" style={{ color: "#fbbf24" }}>{quiz.reading}</p>
           <a href={tweetUrl} target="_blank" rel="noopener noreferrer"
+            aria-label="今日の漢字クイズの答えをXにシェアする"
             className="inline-flex items-center gap-2 px-5 py-2 rounded-xl font-black text-sm active:scale-95"
             style={{ background: "#18181b", color: "#fff" }}>
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -293,7 +294,7 @@ function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
 
       {result === "correct" && (
         <div className="text-center">
-          <p className="text-4xl mb-2">🎉</p>
+          <p className="text-4xl mb-2"></p>
           <p className="font-black text-lg mb-1" style={{ color: "#fbbf24" }}>正解！</p>
           <p className="text-sm mb-2" style={{ color: "rgba(251,191,36,0.7)" }}>{quiz.kanji} = {quiz.reading}{attempts > 1 ? `（${attempts}回目で正解）` : "（一発正解！）"}</p>
 
@@ -318,6 +319,7 @@ function DailyWordleSection({ onCorrect }: { onCorrect: () => void }) {
               {copied ? "コピーしました！" : "結果をコピー"}
             </button>
             <a href={tweetUrl} target="_blank" rel="noopener noreferrer"
+              aria-label="今日の漢字クイズ正解結果をXにシェアする"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl font-black text-sm active:scale-95"
               style={{ background: "#18181b", color: "#fff" }}>
               <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
@@ -399,7 +401,7 @@ function DailyGoalSection() {
             </button>
           </div>
         )}
-        {done && <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "#16a34a", color: "#fff" }}>🎉 達成！</span>}
+        {done && <span className="text-xs font-bold px-3 py-1 rounded-full" style={{ background: "#16a34a", color: "#fff" }}> 達成！</span>}
       </div>
 
       {/* プログレスバー */}
@@ -425,7 +427,7 @@ function DailyGoalSection() {
         <div className="mt-3 pt-3" style={{ borderTop: "1px solid rgba(220,38,38,0.2)" }}>
           <div className="flex items-center justify-between">
             <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>苦手漢字: {weakCount}字</span>
-            <a href="/game" className="text-xs font-bold px-3 py-1.5 rounded-lg"
+            <a href="/game" aria-label="苦手漢字を復習する" className="text-xs font-bold px-3 py-1.5 rounded-lg"
               style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>
               復習する →
             </a>
@@ -436,6 +438,7 @@ function DailyGoalSection() {
 
       <div className="mt-3 text-center">
         <Link href="/game"
+          aria-label="目標達成に挑戦する"
           className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
           目標達成に挑戦する →
@@ -492,8 +495,28 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "linear-gradient(160deg, #1c1917, #292524, #1c1917)" }}>
-      {/* ヒーロー — 道場テーマ */}
+    <div className="min-h-screen relative overflow-hidden" style={{
+      background: 'radial-gradient(ellipse at 20% 30%, rgba(220,38,38,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(251,191,36,0.04) 0%, transparent 50%), linear-gradient(160deg, #1c1917, #292524, #1c1917)',
+    }}>
+      {/* Floating particles */}
+      <style>{`
+        @keyframes brushFloat {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
+          50% { transform: translateY(-35px) rotate(10deg); opacity: 0.6; }
+          100% { transform: translateY(-70px) rotate(-5deg); opacity: 0; }
+        }
+      `}</style>
+      {[12, 30, 48, 65, 82].map((left, i) => (
+        <div key={i} className="fixed pointer-events-none z-0" style={{
+          left: `${left}%`, bottom: '5%',
+          width: 4 + i % 3 * 2, height: 4 + i % 3 * 2,
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${['#DC2626', '#FBBF24', '#DC2626', '#FBBF24', '#DC2626'][i]}, transparent)`,
+          animation: `brushFloat ${4 + i}s ease-in-out ${i * 0.6}s infinite`,
+          boxShadow: `0 0 6px ${['rgba(220,38,38,0.4)', 'rgba(251,191,36,0.4)'][i % 2]}`,
+        }} />
+      ))}
+      {/* ヒーロー -- 道場テーマ */}
       <section className="relative text-white py-20 px-4 text-center overflow-hidden"
         style={{ background: "linear-gradient(180deg, #44403c 0%, #292524 100%)", borderBottom: "2px solid rgba(220,38,38,0.4)" }}>
         {/* 背景装飾 */}
@@ -509,24 +532,30 @@ export default function HomePage() {
             style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}>
             難読漢字 道場
           </span>
-          <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight" style={{ color: "#fff", textShadow: "0 0 20px rgba(220,38,38,0.6)" }}>
+          <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight" style={{
+            background: 'linear-gradient(135deg, #FFF 0%, #FCA5A5 40%, #DC2626 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(0 0 20px rgba(220,38,38,0.5))',
+          }}>
             読み仮名スプリント
           </h1>
           <p className="text-lg md:text-xl mb-2 font-bold" style={{ color: "#fca5a5" }}>茨城・薔薇・山葵…読める？</p>
           <p className="text-sm mb-3" style={{ color: "rgba(252,165,165,0.65)" }}>難読漢字・地名・人名 全3,000問以上</p>
           <p className="text-sm font-bold mb-5" style={{ color: "#fbbf24" }}>
-            🥋 連続正解で段位が上がる！名人を目指せ
+             連続正解で段位が上がる！名人を目指せ
           </p>
           {/* 社会的証明バッジ */}
           <div className="flex flex-wrap justify-center gap-2 mb-7">
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}>👥 累計10,000回以上プレイ</span>
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}>⭐ 満足度 4.7/5.0</span>
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}>📱 スマホ完全対応</span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}> 累計10,000回以上プレイ</span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}> 満足度 4.7/5.0</span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}> スマホ完全対応</span>
           </div>
           <Link href="/game"
-            className="inline-block font-black text-xl px-12 py-4 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95"
+            aria-label="読み仮名スプリント道場に入門する（無料）"
+            className="inline-block font-black text-xl px-12 py-4 rounded-2xl transition-all duration-200 hover:-translate-y-1 active:scale-[0.95] min-h-[56px]"
             style={{
-              background: "linear-gradient(135deg, #dc2626, #991b1b)",
+              background: "linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #7F1D1D 100%)",
               color: "#fff",
               boxShadow: "0 0 40px rgba(220,38,38,0.5), 0 8px 24px rgba(0,0,0,0.4)",
             }}>
@@ -543,9 +572,9 @@ export default function HomePage() {
             <p className="text-xs font-bold mb-3 tracking-widest" style={{ color: "rgba(252,165,165,0.6)" }}>連続学習マイルストーン</p>
             <div className="flex justify-center gap-6 mb-3">
               {[
-                { days: 3, badge: "🔥", label: "3日連続", color: "#f97316" },
-                { days: 7, badge: "⚡", label: "7日連続", color: "#fbbf24" },
-                { days: 30, badge: "👑", label: "30日連続", color: "#a855f7" },
+                { days: 3, badge: "3", label: "3日連続", color: "#f97316" },
+                { days: 7, badge: "7", label: "7日連続", color: "#fbbf24" },
+                { days: 30, badge: "30", label: "30日連続", color: "#a855f7" },
               ].map(m => (
                 <div key={m.days} className="flex flex-col items-center gap-1.5">
                   <div className={`w-14 h-14 rounded-full flex items-center justify-center text-2xl border-2 transition-all ${loginStreak >= m.days ? "scale-110" : "opacity-35"}`}
@@ -564,9 +593,9 @@ export default function HomePage() {
               ))}
             </div>
             <p className="text-sm font-black" style={{ color: "#fca5a5" }}>
-              🔥 現在 {loginStreak}日連続！この調子で続けよう
+               現在 {loginStreak}日連続！この調子で続けよう
             </p>
-            {loginStreak < 3 && <p className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.5)" }}>あと{3 - loginStreak}日で🔥3日連続マイルストーン達成！</p>}
+            {loginStreak < 3 && <p className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.5)" }}>あと{3 - loginStreak}日で3日連続マイルストーン達成！</p>}
           </div>
         </section>
       )}
@@ -589,7 +618,7 @@ export default function HomePage() {
               { num: "N1取得率\n約30%", label: "JLPT N1合格率", sub: "日本語能力試験" },
               { num: "茨城・岐阜\n読める？", label: "都道府県難読地名", sub: "地名研究" },
             ].map((stat) => (
-              <div key={stat.label} className="rounded-2xl p-4 text-center"
+              <div key={stat.label} className="backdrop-blur-md rounded-2xl p-4 text-center"
                 style={{ background: "rgba(68,64,60,0.5)", border: "1px solid rgba(220,38,38,0.2)" }}>
                 <div className="text-base font-black mb-1 whitespace-pre-line leading-tight" style={{ color: "#fca5a5" }}>{stat.num}</div>
                 <div className="text-xs font-bold mb-0.5" style={{ color: "#e7e5e4" }}>{stat.label}</div>
@@ -607,13 +636,13 @@ export default function HomePage() {
           <h2 className="text-center text-lg font-black mb-6" style={{ color: "#fca5a5" }}>段位システム</h2>
           <div className="grid grid-cols-3 gap-3">
             {[
-              { badge: "🥋", rank: "初段", condition: "3問正解" },
-              { badge: "⚔️", rank: "三段", condition: "7問正解" },
-              { badge: "👑", rank: "名人", condition: "全問正解" },
+              { badge: <svg viewBox="0 0 32 32" width={32} height={32}><rect x="4" y="8" width="24" height="16" rx="3" fill="#DC2626" /><text x="16" y="20" textAnchor="middle" fontSize="10" fontWeight="bold" fill="#fff">初</text></svg>, rank: "初段", condition: "3問正解" },
+              { badge: <svg viewBox="0 0 32 32" width={32} height={32}><polygon points="16,2 20,12 31,12 22,19 25,30 16,23 7,30 10,19 1,12 12,12" fill="#FBBF24" /></svg>, rank: "三段", condition: "7問正解" },
+              { badge: <svg viewBox="0 0 32 32" width={32} height={32}><circle cx="16" cy="16" r="14" fill="#7C3AED" /><polygon points="16,6 19,13 27,14 21,19 23,27 16,23 9,27 11,19 5,14 13,13" fill="#FDE68A" /></svg>, rank: "名人", condition: "全問正解" },
             ].map((r) => (
               <div key={r.rank} className="rounded-2xl p-4 text-center"
                 style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
-                <div className="text-3xl mb-1">{r.badge}</div>
+                <div className="mb-1 flex justify-center">{r.badge}</div>
                 <div className="font-black text-sm" style={{ color: "#fca5a5" }}>{r.rank}</div>
                 <div className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.55)" }}>{r.condition}</div>
               </div>
@@ -628,7 +657,7 @@ export default function HomePage() {
           <h2 className="text-xl font-black text-center mb-6" style={{ color: "#e7e5e4" }}>こんな問題が出ます</h2>
           <div className="space-y-3">
             {samples.map(q => (
-              <div key={q.kanji} className="rounded-2xl p-5 flex items-center justify-between"
+              <div key={q.kanji} className="backdrop-blur-md rounded-2xl p-5 flex items-center justify-between"
                 style={{ background: "rgba(68,64,60,0.6)", border: "1px solid rgba(220,38,38,0.2)" }}>
                 <div>
                   <span className="text-xs tracking-widest uppercase" style={{ color: "rgba(220,38,38,0.7)" }}>{q.level}</span>
@@ -649,16 +678,16 @@ export default function HomePage() {
         <section className="py-10 px-4">
           <div className="max-w-lg mx-auto">
             <h2 className="text-center text-lg font-black mb-2" style={{ color: "#fca5a5" }}>
-              🏆 あなたの成績
-              {loginStreak >= 2 && <span className="ml-2 text-sm font-bold" style={{ color: "#fbbf24" }}>🔥 {loginStreak}日連続</span>}
+               あなたの成績
+              {loginStreak >= 2 && <span className="ml-2 text-sm font-bold" style={{ color: "#fbbf24" }}> {loginStreak}日連続</span>}
             </h2>
             <p className="text-center text-xs mb-5" style={{ color: "rgba(252,165,165,0.5)" }}>このブラウザに保存された自己ベスト</p>
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: "🟢 かんたん", value: localBest.easy, unit: "問" },
-                { label: "🟡 ふつう", value: localBest.normal, unit: "問" },
-                { label: "🔴 むずかしい", value: localBest.hard, unit: "問" },
-                { label: "⚡ タイムアタック", value: localBest.ta, unit: "問/60s" },
+                { label: " かんたん", value: localBest.easy, unit: "問" },
+                { label: " ふつう", value: localBest.normal, unit: "問" },
+                { label: " むずかしい", value: localBest.hard, unit: "問" },
+                { label: " タイムアタック", value: localBest.ta, unit: "問/60s" },
               ].map((item) => (
                 <div key={item.label} className="rounded-2xl p-4 text-center"
                   style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.25)" }}>
@@ -672,6 +701,7 @@ export default function HomePage() {
             </div>
             <div className="mt-4 text-center">
               <Link href="/game"
+                aria-label="記録を更新する"
                 className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
                 style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
                 記録を更新する →
@@ -687,7 +717,7 @@ export default function HomePage() {
           <div className="rounded-2xl p-5"
             style={{ background: "rgba(220,38,38,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(220,38,38,0.25)" }}>
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">📖</span>
+              <span aria-hidden="true"><svg viewBox="0 0 24 24" width={24} height={24}><rect x="2" y="4" width="20" height="16" rx="2" fill="none" stroke="#DC2626" strokeWidth="2" /><path d="M6 8h12M6 12h8M6 16h10" stroke="#DC2626" strokeWidth="1.5" strokeLinecap="round" /></svg></span>
               <div>
                 <h2 className="font-black text-sm" style={{ color: "#fca5a5" }}>難読漢字 完全ガイド</h2>
                 <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.6)" }}>薔薇・山葵・蒲公英…由来・覚え方まで解説</p>
@@ -697,6 +727,7 @@ export default function HomePage() {
               食材・植物・動物・地名・日常語の5カテゴリで難読漢字を徹底解説。読み方だけでなく漢字の由来・語源まで学べます。
             </p>
             <Link href="/study"
+              aria-label="難読漢字ガイドを読む"
               className="inline-block text-xs font-bold py-2 px-5 rounded-xl"
               style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}>
               難読漢字ガイドを読む →
@@ -727,7 +758,7 @@ export default function HomePage() {
           </div>
           <div className="mt-4 rounded-xl p-3 text-xs text-center"
             style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)", color: "rgba(252,165,165,0.7)" }}>
-            📚 無料: N5問題（一部） | プレミアム: 全5レベル 3,000問以上
+             無料: N5問題（一部） | プレミアム: 全5レベル 3,000問以上
           </div>
         </div>
       </section>
@@ -746,14 +777,14 @@ export default function HomePage() {
           <p className="text-center text-xs mb-6" style={{ color: "rgba(252,165,165,0.5)" }}>あなたのレベルにぴったりの問題を選ぼう</p>
           <div className="space-y-2">
             {[
-              { grade: "小学1〜2年生", emoji: "🌱", kanji: "山・川・空・犬・花など", desc: "ひらがなを覚えた後の最初の漢字", levels: "N5" },
-              { grade: "小学3〜4年生", emoji: "📘", kanji: "温度・感情・都市名など", desc: "日常生活でよく見る中級漢字", levels: "N4/N3" },
-              { grade: "小学5〜6年生", emoji: "⚔️", kanji: "茨城・蒲公英・土産など", desc: "難読漢字・地名・熟語チャレンジ", levels: "N2" },
-              { grade: "中学生〜大人", emoji: "👑", kanji: "薔薇・山葵・金剛など", desc: "大人でも読めない超難読漢字", levels: "N1/人名" },
+              { grade: "小学1〜2年生", gradeNum: "1", kanji: "山・川・空・犬・花など", desc: "ひらがなを覚えた後の最初の漢字", levels: "N5", color: "#22C55E" },
+              { grade: "小学3〜4年生", gradeNum: "3", kanji: "温度・感情・都市名など", desc: "日常生活でよく見る中級漢字", levels: "N4/N3", color: "#3B82F6" },
+              { grade: "小学5〜6年生", gradeNum: "5", kanji: "茨城・蒲公英・土産など", desc: "難読漢字・地名・熟語チャレンジ", levels: "N2", color: "#F59E0B" },
+              { grade: "中学生〜大人", gradeNum: "A", kanji: "薔薇・山葵・金剛など", desc: "大人でも読めない超難読漢字", levels: "N1/人名", color: "#DC2626" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 rounded-xl px-4 py-3 cursor-pointer hover:opacity-80 transition-opacity"
                 style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
-                <span className="text-2xl shrink-0">{item.emoji}</span>
+                <span className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-black text-sm" style={{ background: `${item.color}22`, color: item.color, border: `1px solid ${item.color}44` }}>{item.gradeNum}</span>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-black" style={{ color: "#fca5a5" }}>{item.grade}</span>
@@ -762,7 +793,7 @@ export default function HomePage() {
                   <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.7)" }}>例: {item.kanji}</p>
                   <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.45)" }}>{item.desc}</p>
                 </div>
-                <a href="/game" className="text-xs font-bold px-3 py-1.5 rounded-lg shrink-0"
+                <a href="/game" aria-label={`${item.grade}の問題に挑戦する`} className="text-xs font-bold px-3 py-1.5 rounded-lg shrink-0"
                   style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
                   挑戦 →
                 </a>
@@ -771,6 +802,7 @@ export default function HomePage() {
           </div>
           <div className="mt-4 text-center">
             <a href="/game"
+              aria-label="今日の目標10問に挑戦する"
               className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
               style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
               今日の目標10問に挑戦する →
@@ -800,7 +832,7 @@ export default function HomePage() {
               <div key={item.rank} className="flex items-center gap-3 rounded-xl px-4 py-3"
                 style={{ background: item.rank <= 3 ? "rgba(220,38,38,0.12)" : "rgba(68,64,60,0.4)", border: `1px solid ${item.rank <= 3 ? "rgba(220,38,38,0.35)" : "rgba(120,113,108,0.3)"}` }}>
                 <div className="text-lg font-black w-7 text-center shrink-0">
-                  {item.rank <= 3 ? ["🥇","🥈","🥉"][item.rank - 1] : `${item.rank}`}
+                  {item.rank <= 3 ? ["","",""][item.rank - 1] : `${item.rank}`}
                 </div>
                 <div className="flex-1 flex items-center gap-3">
                   <span className="text-2xl font-black" style={{ color: "#fff" }}>{item.kanji}</span>
@@ -817,6 +849,7 @@ export default function HomePage() {
           </div>
           <div className="mt-5 text-center">
             <Link href="/game"
+              aria-label="難読漢字TOP10を全部読めるか挑戦する"
               className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
               style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
               これを全部読めるか挑戦する →
@@ -829,18 +862,18 @@ export default function HomePage() {
       {/* グローバルランキング風（固定表示） */}
       <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)" }}>
         <div className="max-w-lg mx-auto">
-          <h2 className="text-center text-lg font-black mb-5" style={{ color: "#fca5a5" }}>🏅 ベストプレイヤー（参考例）</h2>
+          <h2 className="text-center text-lg font-black mb-5" style={{ color: "#fca5a5" }}> ベストプレイヤー（参考例）</h2>
           <div className="space-y-2">
             {[
-              { rank: 1, name: "漢字博士", score: "タイムアタック 31問", badge: "👑 名人", color: "#fbbf24" },
-              { rank: 2, name: "難読マスター", score: "通常モード 全問正解", badge: "⚔️ 五段", color: "#f97316" },
-              { rank: 3, name: "漢字スプリンター", score: "タイムアタック 28問", badge: "⚔️ 三段", color: "#ef4444" },
-              { rank: 4, name: "文字の達人", score: "通常モード 9/10問", badge: "🥋 初段", color: "#a78bfa" },
+              { rank: 1, name: "漢字博士", score: "タイムアタック 31問", badge: " 名人", color: "#fbbf24" },
+              { rank: 2, name: "難読マスター", score: "通常モード 全問正解", badge: "️ 五段", color: "#f97316" },
+              { rank: 3, name: "漢字スプリンター", score: "タイムアタック 28問", badge: "️ 三段", color: "#ef4444" },
+              { rank: 4, name: "文字の達人", score: "通常モード 9/10問", badge: " 初段", color: "#a78bfa" },
             ].map((player) => (
               <div key={player.rank} className="flex items-center gap-3 rounded-xl px-4 py-3"
                 style={{ background: "rgba(68,64,60,0.4)", border: `1px solid rgba(${player.rank === 1 ? "251,191,36" : "120,113,108"},0.3)` }}>
                 <div className="text-lg font-black w-6 text-center" style={{ color: player.rank <= 3 ? player.color : "#78716c" }}>
-                  {player.rank <= 3 ? ["🥇","🥈","🥉"][player.rank - 1] : player.rank}
+                  {player.rank <= 3 ? ["","",""][player.rank - 1] : player.rank}
                 </div>
                 <div className="flex-1">
                   <div className="text-sm font-bold" style={{ color: "#e7e5e4" }}>{player.name}</div>
@@ -858,6 +891,7 @@ export default function HomePage() {
           </p>
           <div className="mt-4 text-center">
             <Link href="/game"
+              aria-label="ランキングに挑戦する"
               className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
               style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
               ランキングに挑戦 →
@@ -876,20 +910,20 @@ export default function HomePage() {
               <p className="font-black text-base mb-1" style={{ color: "#d6d3d1" }}>無料</p>
               <p className="text-3xl font-black mb-4" style={{ color: "#fff" }}>¥0</p>
               <ul className="text-sm space-y-2" style={{ color: "#a8a29e" }}>
-                <li>✓ 毎日10問</li>
-                <li>✓ 難読漢字初級</li>
-                <li>✓ 登録不要</li>
+                <li> 毎日10問</li>
+                <li> 難読漢字初級</li>
+                <li> 登録不要</li>
               </ul>
             </div>
             <div className="rounded-2xl p-6"
               style={{ background: "linear-gradient(135deg, rgba(220,38,38,0.3), rgba(153,27,27,0.3))", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "2px solid rgba(220,38,38,0.5)" }}>
               <p className="font-black text-base mb-1" style={{ color: "#fca5a5" }}>プレミアム</p>
-              <div style={{ display: "inline-block", background: "#16a34a", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "2px 10px", borderRadius: "999px", marginBottom: "8px" }}>🛡️ 30日返金保証</div>
+              <div style={{ display: "inline-block", background: "#16a34a", color: "#fff", fontSize: "10px", fontWeight: "700", padding: "2px 10px", borderRadius: "999px", marginBottom: "8px" }}>️ 30日返金保証</div>
               <p className="text-3xl font-black mb-4" style={{ color: "#fff" }}>¥480<span className="text-sm font-normal" style={{ color: "#fca5a5" }}>/月</span></p>
               <ul className="text-sm space-y-2" style={{ color: "#fcd5d5" }}>
-                <li>✓ 全3,000問</li>
-                <li>✓ 地名・人名・JLPT</li>
-                <li>✓ 毎日無制限</li>
+                <li> 全3,000問</li>
+                <li> 地名・人名・JLPT</li>
+                <li> 毎日無制限</li>
               </ul>
             </div>
           </div>
@@ -905,12 +939,13 @@ export default function HomePage() {
           style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)" }}>
           <p className="font-bold mb-1 text-sm" style={{ color: "#fca5a5" }}>投稿イメージ</p>
           <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.7)" }}>
-            「【読み仮名スプリント】10問中8問正解！段位: 三段⚔️<br />
+            「【読み仮名スプリント】10問中8問正解！段位: 三段️<br />
             薔薇・茨城・山葵…全部読める？<br />
             → yomigana-sprint.vercel.app #難読漢字 #漢字クイズ」
           </p>
         </div>
         <Link href="/game"
+          aria-label="漢字クイズに挑戦してXにシェアする"
           className="inline-block font-black text-lg px-10 py-4 rounded-2xl shadow transition-all hover:scale-105 active:scale-95"
           style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
           挑戦してシェアする →
@@ -921,6 +956,7 @@ export default function HomePage() {
       <section className="py-14 px-4 text-center">
         <h2 className="text-2xl font-black mb-4" style={{ color: "#e7e5e4" }}>まず無料で試してみよう</h2>
         <Link href="/game"
+          aria-label="無料で10問チャレンジを始める"
           className="inline-block font-black text-lg px-12 py-4 rounded-2xl shadow-xl transition-all hover:scale-105 active:scale-95"
           style={{
             background: "linear-gradient(135deg, #dc2626, #991b1b)",
@@ -938,10 +974,10 @@ export default function HomePage() {
           <p className="text-center text-xs mb-6" style={{ color: "rgba(252,165,165,0.5)" }}>全国のプレイヤーからの声</p>
           <div className="space-y-4">
             {[
-              { name: "田中さん（30代・会社員）", badge: "👑 名人", text: "薔薇・山葵・蒲公英… 初めてプレイしたとき10問中3問しか読めなかったのに、1週間でほぼ全問正解できるようになりました！ゲームみたいで楽しくて毎朝の習慣になっています。" },
-              { name: "山田さん（高校2年生）", badge: "⚔️ 五段", text: "国語の先生に「茨城の読み方を知らないの？」と言われてショックでした。このアプリで練習したら授業で一番になれた！毎日の5分が変わります。" },
-              { name: "鈴木さん（40代・主婦）", badge: "⚔️ 三段", text: "小学生の子どもと一緒に楽しんでいます。私のほうが間違えることも多くて大笑い。家族で「今日の難読漢字」を出し合うのが日課になりました。" },
-              { name: "伊藤さん（50代・教師）", badge: "🥋 初段", text: "JLPT N1を目指している外国人学生にも勧めています。段位システムがモチベーションを保つのにとても役立ちます。問題の質が高くて安心して使えます。" },
+              { name: "田中さん（30代・会社員）", badge: " 名人", text: "薔薇・山葵・蒲公英… 初めてプレイしたとき10問中3問しか読めなかったのに、1週間でほぼ全問正解できるようになりました！ゲームみたいで楽しくて毎朝の習慣になっています。" },
+              { name: "山田さん（高校2年生）", badge: "️ 五段", text: "国語の先生に「茨城の読み方を知らないの？」と言われてショックでした。このアプリで練習したら授業で一番になれた！毎日の5分が変わります。" },
+              { name: "鈴木さん（40代・主婦）", badge: "️ 三段", text: "小学生の子どもと一緒に楽しんでいます。私のほうが間違えることも多くて大笑い。家族で「今日の難読漢字」を出し合うのが日課になりました。" },
+              { name: "伊藤さん（50代・教師）", badge: " 初段", text: "JLPT N1を目指している外国人学生にも勧めています。段位システムがモチベーションを保つのにとても役立ちます。問題の質が高くて安心して使えます。" },
             ].map((review, i) => (
               <div key={i} className="rounded-2xl p-4"
                 style={{ background: "rgba(68,64,60,0.4)", border: "1px solid rgba(220,38,38,0.2)" }}>
@@ -950,7 +986,7 @@ export default function HomePage() {
                   <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>{review.badge}</span>
                 </div>
                 <div className="flex mb-2">
-                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: "#fbbf24", fontSize: "12px" }}>★</span>)}
+                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: "#fbbf24", fontSize: "12px" }}></span>)}
                 </div>
                 <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.75)" }}>{review.text}</p>
               </div>
@@ -964,9 +1000,9 @@ export default function HomePage() {
         <h2 className="text-xl font-bold text-center text-white mb-6">こんな経験ありませんか？</h2>
         <div className="space-y-4">
           {[
-            { icon: "😓", text: "小学生の漢字読みが苦手で、テストのたびに落ち込む..." },
-            { icon: "😤", text: "市販のドリルは退屈で、すぐ飽きてしまう..." },
-            { icon: "💭", text: "楽しく練習できる方法があれば、もっと続けられるのに..." },
+            { icon: "", text: "小学生の漢字読みが苦手で、テストのたびに落ち込む..." },
+            { icon: "", text: "市販のドリルは退屈で、すぐ飽きてしまう..." },
+            { icon: "", text: "楽しく練習できる方法があれば、もっと続けられるのに..." },
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-4 rounded-xl p-4"
               style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
@@ -998,12 +1034,12 @@ export default function HomePage() {
               </thead>
               <tbody>
                 {[
-                  { feature: "難読漢字特化", us: "✅ 3,000問", a: "❌ 漢字薄い", b: "⚠️ 少ない" },
-                  { feature: "ゲーム感覚", us: "✅ 段位制", a: "✅ あり", b: "❌ なし" },
-                  { feature: "即プレイ可能", us: "✅ 登録不要", a: "❌ 登録必須", b: "✅ すぐ使える" },
-                  { feature: "JLPT対応", us: "✅ N5〜N1", a: "⚠️ 一部", b: "⚠️ 一部" },
-                  { feature: "スマホ無料", us: "✅ 毎日10問", a: "⚠️ 広告多い", b: "❌ 有料のみ" },
-                  { feature: "地名・人名漢字", us: "✅ 豊富", a: "❌ ほぼなし", b: "⚠️ 少ない" },
+                  { feature: "難読漢字特化", us: " 3,000問", a: " 漢字薄い", b: "️ 少ない" },
+                  { feature: "ゲーム感覚", us: " 段位制", a: " あり", b: " なし" },
+                  { feature: "即プレイ可能", us: " 登録不要", a: " 登録必須", b: " すぐ使える" },
+                  { feature: "JLPT対応", us: " N5〜N1", a: "️ 一部", b: "️ 一部" },
+                  { feature: "スマホ無料", us: " 毎日10問", a: "️ 広告多い", b: " 有料のみ" },
+                  { feature: "地名・人名漢字", us: " 豊富", a: " ほぼなし", b: "️ 少ない" },
                 ].map((row, i) => (
                   <tr key={i} style={{ background: i % 2 === 0 ? "rgba(68,64,60,0.4)" : "rgba(68,64,60,0.2)", borderBottom: "1px solid rgba(220,38,38,0.1)" }}>
                     <td className="px-3 py-2.5 font-bold" style={{ color: "#e7e5e4" }}>{row.feature}</td>
@@ -1018,6 +1054,7 @@ export default function HomePage() {
           <p className="text-center text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>※調査参考値。各サービスの内容は変更になる場合があります</p>
           <div className="mt-4 text-center">
             <Link href="/game"
+              aria-label="今すぐ無料で読み仮名スプリントを始める"
               className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
               style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
               今すぐ無料で始める →
@@ -1043,16 +1080,18 @@ export default function HomePage() {
           ))}
         </div>
         <div className="flex flex-col gap-2 mt-5">
-          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("【読み仮名スプリント】難読漢字に挑戦！🥋 薔薇・茨城・山葵…あなたは全部読める？ゲームで漢字力を試そう！ #難読漢字 #漢字クイズ #読み仮名スプリント")}&url=${encodeURIComponent("https://yomigana-sprint.vercel.app")}`} target="_blank" rel="noopener noreferrer"
+          <a href={`https://twitter.com/intent/tweet?text=${encodeURIComponent("【読み仮名スプリント】難読漢字に挑戦！ 薔薇・茨城・山葵…あなたは全部読める？ゲームで漢字力を試そう！ #難読漢字 #漢字クイズ #読み仮名スプリント")}&url=${encodeURIComponent("https://yomigana-sprint.vercel.app")}`} target="_blank" rel="noopener noreferrer"
+            aria-label="読み仮名スプリントの結果をXでシェアする"
             className="flex items-center justify-center gap-2 text-sm font-bold py-2.5 px-6 rounded-xl transition-colors w-full"
             style={{ background: "#18181b", color: "#fff" }}>
             <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.748l7.73-8.835L1.254 2.25H8.08l4.259 5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
             結果をXでシェア
           </a>
           <a
-            href={`https://line.me/R/msg/text/?${encodeURIComponent("読み仮名スプリントで難読漢字に挑戦！🥋 あなたは何問読める？ https://yomigana-sprint.vercel.app")}`}
+            href={`https://line.me/R/msg/text/?${encodeURIComponent("読み仮名スプリントで難読漢字に挑戦！ あなたは何問読める？ https://yomigana-sprint.vercel.app")}`}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="読み仮名スプリントをLINEで友達に送る"
             className="flex items-center justify-center gap-2 text-sm font-bold py-2.5 px-6 rounded-xl transition-colors w-full"
             style={{ background: "#06C755", color: "#fff" }}>
             <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current">
@@ -1066,7 +1105,7 @@ export default function HomePage() {
       {/* ハンドメイドチャンネル アフィリエイト */}
       <section className="max-w-lg mx-auto px-4 pb-6">
         <div style={{ background: "rgba(6,78,59,0.3)", border: "1px solid rgba(16,185,129,0.35)", borderRadius: "16px", padding: "16px" }}>
-          <p style={{ color: "#6ee7b7", fontWeight: "700", fontSize: "14px", marginBottom: "12px" }}>📚 日本語・国語が好きなら、日本文化を仕事に</p>
+          <p style={{ color: "#6ee7b7", fontWeight: "700", fontSize: "14px", marginBottom: "12px" }}> 日本語・国語が好きなら、日本文化を仕事に</p>
           <a
             href="https://px.a8.net/svt/ejp?a8mat=4AZIOF+8PRGKY+4V0U+BXB8Z"
             target="_blank"
@@ -1089,7 +1128,7 @@ export default function HomePage() {
           <div className="rounded-2xl p-5"
             style={{ background: "rgba(220,38,38,0.08)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)", border: "1px solid rgba(220,38,38,0.25)" }}>
             <div className="flex items-center gap-3 mb-3">
-              <span className="text-2xl">📊</span>
+              <span className="text-2xl"></span>
               <div>
                 <h2 className="font-black text-sm" style={{ color: "#fca5a5" }}>学習レポートを確認する</h2>
                 <p className="text-xs mt-0.5" style={{ color: "rgba(252,165,165,0.6)" }}>今週の正解数・苦手カテゴリ・連続学習日数を確認</p>
@@ -1099,6 +1138,7 @@ export default function HomePage() {
               過去7日間の学習グラフ・難易度別ベストスコア・苦手漢字ランキングを一覧表示。弱点を把握して効率よく漢字力を伸ばそう。
             </p>
             <Link href="/report"
+              aria-label="学習レポートを見る"
               className="inline-block text-xs font-bold py-2 px-5 rounded-xl"
               style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.4)" }}>
               学習レポートを見る →
@@ -1114,9 +1154,9 @@ export default function HomePage() {
           <p className="text-sm mb-6" style={{ color: "rgba(252,165,165,0.6)" }}>間違えた漢字を自動記録→集中練習で弱点を確実に克服</p>
           <div className="space-y-3 mb-6">
             {[
-              { step: "STEP 1", icon: "🎮", title: "ゲームをプレイ", desc: "通常モード・タイムアタックどちらでもOK。難易度は自分のレベルに合わせて選択。" },
-              { step: "STEP 2", icon: "📝", title: "苦手漢字を自動記録", desc: "間違えた漢字は「苦手リスト」に自動保存。何回間違えたかも記録されます。" },
-              { step: "STEP 3", icon: "🎯", title: "集中練習で克服", desc: "結果画面の「苦手克服」タブから苦手漢字だけを集中的に復習。覚えたら「覚えた」ボタンで削除。" },
+              { step: "STEP 1", icon: "", title: "ゲームをプレイ", desc: "通常モード・タイムアタックどちらでもOK。難易度は自分のレベルに合わせて選択。" },
+              { step: "STEP 2", icon: "", title: "苦手漢字を自動記録", desc: "間違えた漢字は「苦手リスト」に自動保存。何回間違えたかも記録されます。" },
+              { step: "STEP 3", icon: "", title: "集中練習で克服", desc: "結果画面の「苦手克服」タブから苦手漢字だけを集中的に復習。覚えたら「覚えた」ボタンで削除。" },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 rounded-xl p-4"
                 style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.2)" }}>
@@ -1133,6 +1173,7 @@ export default function HomePage() {
           </div>
           <div className="text-center">
             <Link href="/game"
+              aria-label="苦手漢字を克服する練習を始める"
               className="inline-block font-black py-3 px-8 rounded-xl text-sm active:scale-95 transition-transform"
               style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
               苦手漢字を克服する →
@@ -1173,22 +1214,22 @@ export default function HomePage() {
           <div className="space-y-4">
             {[
               {
-                icon: "🥋",
+                icon: "",
                 title: "段位制でモチベーションが続く",
                 desc: "初段・三段・五段・名人と段位が上がる仕組み。連続正解でボーナス点が入り、ゲーム感覚で続けられます。",
               },
               {
-                icon: "📖",
+                icon: "",
                 title: "苦手漢字を自動記録・復習",
                 desc: "間違えた漢字は自動で「苦手リスト」に保存。あとで集中練習できるので、弱点を確実に克服できます。",
               },
               {
-                icon: "⚡",
+                icon: "",
                 title: "タイムアタックで速読力強化",
                 desc: "60秒で何問解けるか競うタイムアタックモード。瞬時に読み方を判断する速読力が身につきます。",
               },
               {
-                icon: "📊",
+                icon: "",
                 title: "学習レポートで進捗を可視化",
                 desc: "過去7日間の学習グラフ・苦手カテゴリ・連続学習日数を一覧表示。自分の成長が一目でわかります。",
               },
@@ -1208,12 +1249,12 @@ export default function HomePage() {
 
       {/* もっと楽しむ3選 */}
       <section className="max-w-lg mx-auto px-4 py-8">
-        <h2 className="text-center text-base font-bold mb-4" style={{ color: "#ef4444" }}>📚 もっと楽しむ3選</h2>
+        <h2 className="text-center text-base font-bold mb-4" style={{ color: "#ef4444" }}> もっと楽しむ3選</h2>
         <ol className="space-y-3">
           {[
-            { icon: "🥇", title: "全難易度をクリアしよう", desc: "易・普通・難・超難の4段階を制覇してJLPT N1レベルの難読漢字を完全習得！" },
-            { icon: "📣", title: "スコアをXでシェア", desc: "ゲームクリア後にXでスコア投稿。「難読漢字オタク認定」をもらおう！" },
-            { icon: "📖", title: "毎日1ステージの脳トレ習慣", desc: "朝5分の漢字スプリントで記憶力・語彙力が着実にアップ。" },
+            { icon: "", title: "全難易度をクリアしよう", desc: "易・普通・難・超難の4段階を制覇してJLPT N1レベルの難読漢字を完全習得！" },
+            { icon: "", title: "スコアをXでシェア", desc: "ゲームクリア後にXでスコア投稿。「難読漢字オタク認定」をもらおう！" },
+            { icon: "", title: "毎日1ステージの脳トレ習慣", desc: "朝5分の漢字スプリントで記憶力・語彙力が着実にアップ。" },
           ].map((item, i) => (
             <li key={i} className="flex items-start gap-3"
               style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)", borderRadius: "12px", padding: "12px 14px" }}>
@@ -1230,12 +1271,12 @@ export default function HomePage() {
       <footer className="text-center text-xs pb-8" style={{ color: "rgba(120,113,108,0.6)" }}>
         <p>© 2026 ポッコリラボ</p>
         <div className="flex justify-center gap-4 mt-1">
-          <a href="/legal" className="underline hover:opacity-70">特定商取引法</a>
-          <a href="/privacy" className="underline hover:opacity-70">プライバシーポリシー</a>
-          <a href="/terms" className="underline hover:opacity-70">利用規約</a>
+          <a href="/legal" aria-label="特定商取引法に基づく表記" className="underline hover:opacity-70">特定商取引法</a>
+          <a href="/privacy" aria-label="プライバシーポリシー" className="underline hover:opacity-70">プライバシーポリシー</a>
+          <a href="/terms" aria-label="利用規約" className="underline hover:opacity-70">利用規約</a>
         </div>
         <p className="mt-1">
-          <a href="https://twitter.com/levona_design" className="underline hover:opacity-70">お問い合わせ: X @levona_design</a>
+          <a href="https://twitter.com/levona_design" aria-label="お問い合わせ: X @levona_design" className="underline hover:opacity-70">お問い合わせ: X @levona_design</a>
         </p>
       </footer>
     </div>

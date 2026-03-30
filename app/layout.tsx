@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
+
+const notoSansJP = Noto_Sans_JP({ subsets: ["latin"], weight: ["400", "700"], display: "swap" });
 
 const SITE_URL = "https://yomigana-sprint.vercel.app";
 const TITLE = "読み仮名スプリント — 難読漢字クイズ｜茨城・薔薇・山葵を読める？";
@@ -23,6 +26,7 @@ export const metadata: Metadata = {
   twitter: { card: "summary_large_image", title: TITLE, description: DESC },
   alternates: { canonical: SITE_URL },
   robots: { index: true, follow: true },
+  other: { "theme-color": "#0F0F1A" },
 };
 
 const jsonLd = {
@@ -61,7 +65,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
-      <body className="bg-white text-gray-900 antialiased">
+      <body className={`${notoSansJP.className} bg-[#0F0F1A] text-slate-100 antialiased`}>
         {children}
         <Analytics />
       </body>

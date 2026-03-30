@@ -4,7 +4,7 @@ import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
 import KomojuButton from "./KomojuButton";
 
-// ─── Web Speech API ────────────────────────────────────────────────────────
+//  Web Speech API 
 function speakReading(text: string) {
   if (typeof speechSynthesis === "undefined") return;
   speechSynthesis.cancel();
@@ -15,14 +15,14 @@ function speakReading(text: string) {
   speechSynthesis.speak(utter);
 }
 
-// ─── 段位認定証 Canvas生成 ────────────────────────────────────────────────────
+//  段位認定証 Canvas生成 
 function getScoreRank(score: number): { rank: string; badge: string } {
-  if (score >= 96) return { rank: "名人", badge: "👑" };
-  if (score >= 86) return { rank: "五段", badge: "⚔️" };
-  if (score >= 71) return { rank: "四段", badge: "⚔️" };
-  if (score >= 51) return { rank: "三段", badge: "🥋" };
-  if (score >= 31) return { rank: "二段", badge: "🥋" };
-  return { rank: "初段", badge: "📖" };
+  if (score >= 96) return { rank: "名人", badge: "" };
+  if (score >= 86) return { rank: "五段", badge: "️" };
+  if (score >= 71) return { rank: "四段", badge: "️" };
+  if (score >= 51) return { rank: "三段", badge: "" };
+  if (score >= 31) return { rank: "二段", badge: "" };
+  return { rank: "初段", badge: "" };
 }
 
 function downloadCertificate(score: number, totalScore: number, diffLabel: string) {
@@ -105,9 +105,10 @@ function CertificateButton({ score, diffLabel }: { score: number; diffLabel: str
 
   return (
     <div className="rounded-2xl p-4 mb-3" style={{ background: "rgba(251,191,36,0.08)", border: "1px solid rgba(251,191,36,0.3)" }}>
-      <p className="text-center text-xs font-bold mb-3" style={{ color: "#fbbf24" }}>🏅 段位認定証を取得する</p>
+      <p className="text-center text-xs font-bold mb-3" style={{ color: "#fbbf24" }}> 段位認定証を取得する</p>
       <div className="flex gap-2">
         <button
+          aria-label="段位認定証をダウンロード"
           onClick={handleDownload}
           className="flex-1 flex items-center justify-center gap-1.5 font-black py-2.5 rounded-xl text-sm active:scale-95 transition-transform"
           style={{ background: "linear-gradient(135deg, #d97706, #92400e)", color: "#fff" }}
@@ -140,7 +141,7 @@ const WEAK_LIST_KEY = "yomigana_weak_list";
 const VOICE_KEY = "yomigana_voice_enabled";
 const STREAK_FREEZE_KEY = "yomigana_streak_freeze";
 
-// ─── Streak Freeze（Duolingo型継続設計） ────────────────────────────────────
+//  Streak Freeze（Duolingo型継続設計） 
 function getStreakFreezeCount(): number {
   try { return parseInt(localStorage.getItem(STREAK_FREEZE_KEY) ?? "0", 10) || 0; } catch { return 0; }
 }
@@ -179,11 +180,11 @@ function saveVoice(v: boolean) {
   try { localStorage.setItem(VOICE_KEY, v ? "1" : "0"); } catch { /* noop */ }
 }
 
-// ─── ストリークマイルストーン ────────────────────────────────────────────
+//  ストリークマイルストーン 
 const STREAK_MILESTONES = [
-  { days: 3, label: "3日連続", badge: "🔥", color: "#f97316" },
-  { days: 7, label: "7日連続", badge: "⚡", color: "#fbbf24" },
-  { days: 30, label: "30日連続", badge: "👑", color: "#a855f7" },
+  { days: 3, label: "3日連続", badge: "", color: "#f97316" },
+  { days: 7, label: "7日連続", badge: "", color: "#fbbf24" },
+  { days: 30, label: "30日連続", badge: "", color: "#a855f7" },
 ];
 
 function getNextMilestone(streak: number): { days: number; label: string; badge: string; color: string } | null {
@@ -193,7 +194,7 @@ function getNextMilestone(streak: number): { days: number; label: string; badge:
   return null;
 }
 
-// ─── 苦手リスト管理 ──────────────────────────────────────────────────────────
+//  苦手リスト管理 
 type WeakItem = { kanji: string; correct: string; level: string; missCount: number };
 
 function getWeakList(): WeakItem[] {
@@ -224,9 +225,9 @@ function removeFromWeakList(kanji: string) {
 type Difficulty = "easy" | "normal" | "hard";
 
 const DIFFICULTY_CONFIG = {
-  easy:   { label: "かんたん", emoji: "🟢", desc: "小学1-2年レベル",  bestKey: "yomigana_best_easy",   levels: ["N5"] },
-  normal: { label: "ふつう",   emoji: "🟡", desc: "小学3-4年レベル",  bestKey: "yomigana_best_normal", levels: ["N5", "N4", "N3", "地名"] },
-  hard:   { label: "むずかしい", emoji: "🔴", desc: "小学5-6年レベル", bestKey: "yomigana_best_hard",   levels: ["N2", "N1", "人名", "地名"] },
+  easy:   { label: "かんたん", emoji: "", desc: "小学1-2年レベル",  bestKey: "yomigana_best_easy",   levels: ["N5"] },
+  normal: { label: "ふつう",   emoji: "", desc: "小学3-4年レベル",  bestKey: "yomigana_best_normal", levels: ["N5", "N4", "N3", "地名"] },
+  hard:   { label: "むずかしい", emoji: "", desc: "小学5-6年レベル", bestKey: "yomigana_best_hard",   levels: ["N2", "N1", "人名", "地名"] },
 } as const;
 
 function getSavedDifficulty(): Difficulty {
@@ -261,7 +262,7 @@ function filterByDifficulty(questions: Question[], d: Difficulty): Question[] {
   return filtered.length >= 5 ? filtered : questions;
 }
 
-// ─── ログインストリーク ─────────────────────────────────────────────────────
+//  ログインストリーク 
 
 function getYomiganaStreakData(): { streak: number; lastDate: string } {
   try {
@@ -306,11 +307,11 @@ const TIME_ATTACK_SECONDS = 60;
 
 function getDanLevel(correctCount: number, total: number): { badge: string; rank: string; color: string } {
   const accuracy = total > 0 ? (correctCount / total) * 100 : 0;
-  if (accuracy >= 100) return { badge: "👑", rank: "名人", color: "#fbbf24" };
-  if (accuracy >= 90) return { badge: "⚔️", rank: "五段", color: "#f97316" };
-  if (accuracy >= 70) return { badge: "⚔️", rank: "三段", color: "#ef4444" };
-  if (accuracy >= 50) return { badge: "🥋", rank: "初段", color: "#a78bfa" };
-  return { badge: "📖", rank: "見習い", color: "#78716c" };
+  if (accuracy >= 100) return { badge: "", rank: "名人", color: "#fbbf24" };
+  if (accuracy >= 90) return { badge: "️", rank: "五段", color: "#f97316" };
+  if (accuracy >= 70) return { badge: "️", rank: "三段", color: "#ef4444" };
+  if (accuracy >= 50) return { badge: "", rank: "初段", color: "#a78bfa" };
+  return { badge: "", rank: "見習い", color: "#78716c" };
 }
 
 export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
@@ -470,7 +471,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       <div className="min-h-screen flex items-center justify-center px-4"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         <div className="max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🥋</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-3xl font-black mb-2" style={{ color: "#e7e5e4" }}>モードを選択</h2>
           <p className="text-sm mb-3" style={{ color: "#78716c" }}>どちらのモードで道場に入門しますか？</p>
 
@@ -497,7 +498,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                 </p>
               )}
               {!nextMilestone && (
-                <p className="text-xs font-bold" style={{ color: "#a855f7" }}>👑 全マイルストーン達成！{loginStreak}日連続継続中</p>
+                <p className="text-xs font-bold" style={{ color: "#a855f7" }}> 全マイルストーン達成！{loginStreak}日連続継続中</p>
               )}
             </div>
           )}
@@ -505,7 +506,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           {/* Streak Freeze バナー */}
           {streakAtRisk && loginStreak >= 3 && (
             <div className="mb-4 rounded-xl p-3" style={{ background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.4)" }}>
-              <p className="text-xs font-black mb-1" style={{ color: "#fca5a5" }}>⚠️ {loginStreak}日連続のストリークが危険！</p>
+              <p className="text-xs font-black mb-1" style={{ color: "#fca5a5" }}>️ {loginStreak}日連続のストリークが危険！</p>
               {streakFreezeCount > 0 ? (
                 <div className="flex items-center justify-between">
                   <p className="text-xs" style={{ color: "rgba(252,165,165,0.7)" }}>
@@ -523,7 +524,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                     className="text-xs font-black px-3 py-1.5 rounded-full ml-2 shrink-0"
                     style={{ background: "rgba(239,68,68,0.3)", color: "#fca5a5", border: "1px solid rgba(239,68,68,0.6)" }}
                   >
-                    🧊 フリーズ使用
+                     フリーズ使用
                   </button>
                 </div>
               ) : (
@@ -535,13 +536,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           )}
           {freezeApplied && (
             <div className="mb-3 text-center text-xs font-black animate-bounce" style={{ color: "#34d399" }}>
-              🧊 ストリークフリーズ発動！ストリークを守りました！
+               ストリークフリーズ発動！ストリークを守りました！
             </div>
           )}
 
           {/* 音声読み上げトグル */}
           <div className="flex items-center justify-center gap-2 mb-5">
             <button
+              aria-label="音声読み上げのオン/オフを切り替え"
               onClick={() => { const v = !voiceEnabled; setVoiceEnabled(v); saveVoice(v); }}
               className="flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold transition-all"
               style={voiceEnabled
@@ -549,7 +551,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                 : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "1px solid rgba(68,64,60,0.6)" }
               }
             >
-              {voiceEnabled ? "🔊 読み上げON" : "🔇 読み上げOFF"}
+              {voiceEnabled ? " 読み上げON" : " 読み上げOFF"}
             </button>
           </div>
 
@@ -597,11 +599,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                 setQuestionResults([]);
                 setPhase("playing");
               }}
+              aria-label="通常モードを開始"
               className="w-full p-5 rounded-2xl text-left transition-all active:scale-95"
               style={{ background: "rgba(68,64,60,0.6)", border: "2px solid rgba(120,113,108,0.4)" }}
             >
               <div className="flex items-center gap-3">
-                <span className="text-3xl">📖</span>
+                <span className="text-3xl"></span>
                 <div>
                   <p className="text-lg font-black" style={{ color: "#e7e5e4" }}>通常モード</p>
                   <p className="text-xs mt-0.5" style={{ color: "#78716c" }}>10問に挑戦・段位認定あり</p>
@@ -617,18 +620,19 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                 setTaCorrect(0);
                 setPhase("playing");
               }}
+              aria-label="タイムアタック60秒モードを開始"
               className="w-full p-5 rounded-2xl text-left transition-all active:scale-95"
               style={{ background: "rgba(220,38,38,0.15)", border: "2px solid rgba(220,38,38,0.5)" }}
             >
               <div className="flex items-center gap-3">
-                <span className="text-3xl">⚡</span>
+                <span className="text-3xl"></span>
                 <div>
                   <p className="text-lg font-black" style={{ color: "#fca5a5" }}>タイムアタック 60秒</p>
                   <p className="text-xs mt-0.5" style={{ color: "#a87e70" }}>60秒で何問解けるか勝負！スコアをXでシェア</p>
                 </div>
               </div>
               <div className="mt-2 text-xs font-bold px-2 py-1 rounded-full w-fit"
-                style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>NEW 🔥</div>
+                style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>NEW </div>
             </button>
           </div>
         </div>
@@ -643,18 +647,19 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     const shareText = `【読み仮名スプリント】60秒タイムアタックで${taCorrect}問正解！段位:${danLevel.rank}${danLevel.badge}\n茨城・薔薇・山葵…あなたは60秒で何問読める？ → ${baseUrl} #難読漢字 #タイムアタック #漢字クイズ`;
     const tweetUrl = `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
     const tier = taCorrect >= 20 ? "legendary" : taCorrect >= 15 ? "master" : taCorrect >= 10 ? "expert" : "beginner";
-    const tierLabel = { legendary: "👑 伝説の読み師！", master: "⚔️ 漢字マスター！", expert: "🥋 なかなかやるね！", beginner: "📖 練習あるのみ！" }[tier];
+    const tierLabel = { legendary: " 伝説の読み師！", master: "️ 漢字マスター！", expert: " なかなかやるね！", beginner: " 練習あるのみ！" }[tier];
     return (
       <div className="min-h-screen flex items-center justify-center px-4"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         <div className="max-w-md w-full text-center">
-          <div className="text-6xl mb-3 animate-bounce">⏱️</div>
+          <div className="rounded-2xl p-6 mb-2 backdrop-blur-md" style={{ background: "rgba(28,25,23,0.85)", border: "1px solid rgba(220,38,38,0.25)", boxShadow: "0 8px 32px rgba(220,38,38,0.1)" }}>
+          <div className="text-6xl mb-3 animate-bounce">️</div>
           <h2 className="text-2xl font-black mb-1" style={{ color: "#e7e5e4" }}>60秒終了！</h2>
           <p className="text-6xl font-black mb-1" style={{ color: "#fca5a5" }}>{taCorrect}<span className="text-2xl" style={{ color: "#78716c" }}>問正解</span></p>
           {taNewRecord ? (
-            <p className="text-base font-black mb-1 animate-bounce" style={{ color: "#fbbf24" }}>🏆 NEW RECORD！</p>
+            <p className="text-base font-black mb-1 animate-bounce" style={{ color: "#fbbf24" }}> NEW RECORD！</p>
           ) : (
-            <p className="text-sm mb-1" style={{ color: "#78716c" }}>🏆 自己最高: {taBest}問 {taCorrect >= taBest ? "" : `（あと${taBest - taCorrect + 1}問で更新）`}</p>
+            <p className="text-sm mb-1" style={{ color: "#78716c" }}> 自己最高: {taBest}問 {taCorrect >= taBest ? "" : `（あと${taBest - taCorrect + 1}問で更新）`}</p>
           )}
           <p className="text-lg font-black mb-4" style={{ color: "#fbbf24" }}>{tierLabel}</p>
           {/* スコアバー */}
@@ -668,13 +673,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             <svg viewBox="0 0 24 24" className="w-5 h-5 fill-current">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
-            {taCorrect}問をXでシェア！⚡
+            {taCorrect}問をXでシェア！
           </a>
-          <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setTaCorrect(0); setTimeLeft(TIME_ATTACK_SECONDS); setPhase("mode_select"); setSelected(null); setIsCorrect(null); }}
+          <button aria-label="もう一度タイムアタックに挑戦" onClick={() => { setIdx(0); setScore(0); setStreak(0); setTaCorrect(0); setTimeLeft(TIME_ATTACK_SECONDS); setPhase("mode_select"); setSelected(null); setIsCorrect(null); }}
             className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform"
             style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
-            🥋 もう一度！
+             もう一度！
           </button>
+          </div>{/* glassmorphism card end */}
         </div>
       </div>
     );
@@ -685,21 +691,21 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       <div className="min-h-screen flex items-center justify-center px-4"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         <div className="max-w-md w-full text-center">
-          <div className="text-6xl mb-4">📚</div>
+          <div className="text-6xl mb-4"></div>
           <h2 className="text-2xl font-black mb-2" style={{ color: "#e7e5e4" }}>本日の無料問題が終了しました</h2>
           <p className="mb-6" style={{ color: "#78716c" }}>プレミアムで全3,000問に挑戦しよう！</p>
           <div className="rounded-2xl p-6 mb-4"
             style={{ background: "rgba(68,64,60,0.5)", border: "1px solid rgba(220,38,38,0.3)" }}>
             <p className="text-3xl font-black mb-1" style={{ color: "#fca5a5" }}>¥480<span className="text-base font-normal" style={{ color: "#78716c" }}>/月</span></p>
             <ul className="text-sm text-left space-y-2 mt-4" style={{ color: "#a8a29e" }}>
-              <li>✓ 全3,000問（地名・人名・難読・JLPT N1〜N5）</li>
-              <li>✓ 毎日無制限でプレイ</li>
-              <li>✓ ランキング機能</li>
+              <li> 全3,000問（地名・人名・難読・JLPT N1〜N5）</li>
+              <li> 毎日無制限でプレイ</li>
+              <li> ランキング機能</li>
             </ul>
           </div>
           <KomojuButton
             planId="standard"
-            planLabel="🥋 プレミアムで道場を続ける →"
+            planLabel=" プレミアムで道場を続ける →"
             className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform disabled:opacity-50 bg-red-700 hover:bg-red-800 text-white"
           />
           <p className="text-xs mt-3" style={{ color: "rgba(120,113,108,0.5)" }}>明日また10問無料でプレイできます</p>
@@ -730,6 +736,8 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       <div className="min-h-screen px-4 py-8"
         style={{ background: "linear-gradient(160deg, #1c1917, #292524)" }}>
         <div className="max-w-md mx-auto text-center">
+          {/* スコアカード */}
+          <div className="rounded-2xl p-6 mb-4 backdrop-blur-md" style={{ background: "rgba(28,25,23,0.85)", border: "1px solid rgba(220,38,38,0.25)", boxShadow: "0 8px 32px rgba(220,38,38,0.1)" }}>
           {/* 段位バッジ */}
           <div className="text-7xl mb-2">{danLevel.badge}</div>
           <div className="inline-block px-5 py-2 rounded-full font-black text-xl mb-2"
@@ -747,31 +755,33 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           <p className="text-5xl font-black mb-1" style={{ color: "#fca5a5" }}>{score}<span className="text-xl" style={{ color: "#a8a29e" }}>点</span></p>
           <p className="mb-1" style={{ color: "#78716c" }}>{total}問中 {correctCount}問正解 / 正解率{accuracy}%</p>
           {isNewDiffRecord ? (
-            <p className="text-sm font-black mb-1 animate-bounce" style={{ color: "#fbbf24" }}>🏆 [{diffCfg.label}] 自己記録更新！{correctCount}問</p>
+            <p className="text-sm font-black mb-1 animate-bounce" style={{ color: "#fbbf24" }}> [{diffCfg.label}] 自己記録更新！{correctCount}問</p>
           ) : (
-            <p className="text-xs mb-1" style={{ color: "#78716c" }}>🏆 [{diffCfg.label}] 最高: {currentDiffBest}問</p>
+            <p className="text-xs mb-1" style={{ color: "#78716c" }}> [{diffCfg.label}] 最高: {currentDiffBest}問</p>
           )}
           <p className="text-sm font-bold mb-4" style={{ color: danLevel.color }}>{rankLabel}</p>
 
           {/* タブ切り替え */}
           <div className="flex gap-2 mb-4">
             <button
+              aria-label="結果タブを表示"
               onClick={() => setResultTab("result")}
               className="flex-1 py-2 rounded-xl text-sm font-black transition-all"
               style={resultTab === "result"
                 ? { background: "rgba(220,38,38,0.35)", color: "#fca5a5", border: "2px solid rgba(220,38,38,0.7)" }
                 : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "2px solid rgba(68,64,60,0.6)" }}
             >
-              📊 結果
+               結果
             </button>
             <button
+              aria-label="苦手克服タブを表示"
               onClick={() => setResultTab("weak")}
               className="flex-1 py-2 rounded-xl text-sm font-black transition-all relative"
               style={resultTab === "weak"
                 ? { background: "rgba(220,38,38,0.35)", color: "#fca5a5", border: "2px solid rgba(220,38,38,0.7)" }
                 : { background: "rgba(68,64,60,0.4)", color: "#78716c", border: "2px solid rgba(68,64,60,0.6)" }}
             >
-              📖 苦手克服
+               苦手克服
               {weakListAll.length > 0 && (
                 <span className="absolute -top-1 -right-1 text-xs font-black px-1.5 py-0.5 rounded-full"
                   style={{ background: "#dc2626", color: "#fff", minWidth: "20px" }}>
@@ -802,13 +812,13 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               {/* Streak Freeze獲得（全問正解ボーナス） */}
               {correctCount === total && total >= 5 && (
                 <div className="rounded-xl p-3 mb-3" style={{ background: "rgba(56,189,248,0.1)", border: "1px solid rgba(56,189,248,0.4)" }}>
-                  <p className="text-xs font-black mb-1" style={{ color: "#38bdf8" }}>🧊 ストリークフリーズ獲得！</p>
+                  <p className="text-xs font-black mb-1" style={{ color: "#38bdf8" }}> ストリークフリーズ獲得！</p>
                   <p className="text-xs mb-2" style={{ color: "rgba(56,189,248,0.7)" }}>
                     全問正解ボーナス！ストリークフリーズが1個追加されました。<br />
                     万が一プレイできない日があってもストリークを守れます。
                   </p>
                   <p className="text-xs font-bold" style={{ color: "#38bdf8" }}>
-                    🧊 残りフリーズ: {streakFreezeCount + 1}個
+                     残りフリーズ: {streakFreezeCount + 1}個
                   </p>
                   {typeof window !== "undefined" && (() => {
                     // 付与処理（表示と同時に実行）
@@ -827,13 +837,13 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               {/* Wordle式グリッドシェア */}
               {questionResults.length > 0 && (
                 <div className="rounded-2xl p-4 mb-3" style={{ background: "rgba(220,38,38,0.08)", border: "1px solid rgba(220,38,38,0.3)" }}>
-                  <p className="text-center text-xs font-bold mb-2" style={{ color: "#fca5a5" }}>📊 今日の結果グリッド</p>
+                  <p className="text-center text-xs font-bold mb-2" style={{ color: "#fca5a5" }}> 今日の結果グリッド</p>
                   <div className="text-center text-2xl tracking-widest mb-3 leading-relaxed">
-                    {questionResults.map(r => r ? '🟩' : '🟥').join('')}
+                    {questionResults.map(r => r ? '' : '').join('')}
                   </div>
                   <button
                     onClick={() => {
-                      const grid = questionResults.map(r => r ? '🟩' : '🟥').join('');
+                      const grid = questionResults.map(r => r ? '' : '').join('');
                       const correctN = questionResults.filter(Boolean).length;
                       const text = `今日の難読漢字 ${correctN}/${questionResults.length}\n${grid}\n#読み仮名スプリント`;
                       const url = 'https://yomigana-sprint.vercel.app';
@@ -859,7 +869,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setQuestionResults([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
                 className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg"
                 style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
-                🥋 もう一度挑戦！
+                 もう一度挑戦！
               </button>
             </>
           ) : (
@@ -867,7 +877,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             <div className="text-left">
               {weakListAll.length === 0 ? (
                 <div className="text-center py-8" style={{ color: "#78716c" }}>
-                  <div className="text-4xl mb-3">🎉</div>
+                  <div className="text-4xl mb-3"></div>
                   <p className="font-black" style={{ color: "#fca5a5" }}>苦手リストが空です！</p>
                   <p className="text-sm mt-1">まだ間違えていません。このまま続けよう！</p>
                 </div>
@@ -892,7 +902,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
                           onClick={() => { removeFromWeakList(w.kanji); setWeakList(getWeakList()); }}
                           className="text-xs px-2 py-1 rounded-lg transition-all"
                           style={{ background: "rgba(34,197,94,0.2)", color: "#86efac", border: "1px solid rgba(34,197,94,0.4)" }}>
-                          覚えた✓
+                          覚えた
                         </button>
                       </div>
                     ))}
@@ -905,11 +915,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               <button onClick={() => { setIdx(0); setScore(0); setStreak(0); setDiffNewRecord(false); setWrongQuestions([]); setQuestionResults([]); setResultTab("result"); setPhase("mode_select"); setShowStreakBanner(false); }}
                 className="w-full font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform shadow-lg mt-4"
                 style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
-                🥋 もう一度挑戦！
+                 もう一度挑戦！
               </button>
             </div>
           )}
         </div>
+          </div>{/* glassmorphism card end */}
       </div>
     );
   }
@@ -925,7 +936,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none">
           <div className="px-6 py-3 rounded-2xl font-black text-white text-lg shadow-2xl animate-bounce"
             style={{ background: "linear-gradient(135deg, #dc2626, #fbbf24)", boxShadow: "0 0 30px rgba(220,38,38,0.7)" }}>
-            🥋 {loginStreak}日連続道場入門！
+             {loginStreak}日連続道場入門！
           </div>
         </div>
       )}
@@ -938,7 +949,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               background: "linear-gradient(135deg, #dc2626, #ef4444)",
               boxShadow: "0 0 40px rgba(220,38,38,0.8)",
             }}>
-            🔥 {streak}連続正解！
+             {streak}連続正解！
           </div>
         </div>
       )}
@@ -948,13 +959,13 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         {gameMode === "timeattack" ? (
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm font-bold px-2 py-1 rounded-full"
-              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>⚡ タイムアタック</span>
+              style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}> タイムアタック</span>
             <div className={`text-3xl font-black transition-all ${timeLeft <= 10 ? "animate-pulse" : ""}`}
               style={{ color: timeLeft <= 10 ? "#ef4444" : "#fca5a5" }}>
               {timeLeft}<span className="text-base font-normal" style={{ color: "#78716c" }}>s</span>
             </div>
             <div className="text-right">
-              <span className="font-black text-lg block" style={{ color: "#fbbf24" }}>✓{taCorrect}</span>
+              <span className="font-black text-lg block" style={{ color: "#fbbf24" }}>{taCorrect}</span>
               {taBest > 0 && <span className="text-xs" style={{ color: "#78716c" }}>最高{taBest}</span>}
             </div>
           </div>
@@ -965,7 +976,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             {streak >= 3 && (
               <span className="text-sm font-black px-2 py-1 rounded-full"
                 style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5" }}>
-                🔥 {streak}連続
+                 {streak}連続
               </span>
             )}
             {streak < 3 && <span className="text-sm" style={{ color: "rgba(120,113,108,0.5)" }}>連続: {streak}</span>}
@@ -976,7 +987,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full"
               style={{ background: "rgba(220,38,38,0.15)", border: "1px solid rgba(220,38,38,0.3)" }}>
-              {loginStreak >= 30 ? <span className="text-sm">👑</span> : loginStreak >= 7 ? <span className="text-sm">⚡</span> : <span className="text-sm">🔥</span>}
+              {loginStreak >= 30 ? <span className="text-sm"></span> : loginStreak >= 7 ? <span className="text-sm"></span> : <span className="text-sm"></span>}
               <span className="text-sm font-bold" style={{ color: "#fca5a5" }}>{loginStreak}日連続道場</span>
             </div>
           </div>
@@ -1039,7 +1050,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
               : { background: "rgba(68,64,60,0.3)", color: "rgba(120,113,108,0.5)", border: "1px solid rgba(68,64,60,0.5)" }
             }
           >
-            {voiceEnabled ? "🔊 読み上げON" : "🔇 読み上げOFF"}
+            {voiceEnabled ? " 読み上げON" : " 読み上げOFF"}
           </button>
           {!isPremium && (
             <p className="text-xs" style={{ color: "rgba(120,113,108,0.5)" }}>

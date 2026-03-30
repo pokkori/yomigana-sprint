@@ -24,7 +24,7 @@ const jsonLd = {
 const CATEGORIES = [
   {
     title: "食材・料理",
-    emoji: "🍱",
+    emoji: "",
     items: [
       { kanji: "山葵", reading: "わさび", note: "アブラナ科の植物。辛味成分・水辺で育つ。" },
       { kanji: "小豆", reading: "あずき", note: "マメ科の一年草。和菓子の原料として有名。" },
@@ -38,7 +38,7 @@ const CATEGORIES = [
   },
   {
     title: "植物・花",
-    emoji: "🌸",
+    emoji: "",
     items: [
       { kanji: "薔薇", reading: "ばら", note: "バラ科の花。「薔」も「薇」も草冠に複雑な字。" },
       { kanji: "蒲公英", reading: "たんぽぽ", note: "キク科の多年草。3文字全てで「たんぽぽ」と読む。" },
@@ -52,7 +52,7 @@ const CATEGORIES = [
   },
   {
     title: "動物",
-    emoji: "🐾",
+    emoji: "",
     items: [
       { kanji: "海豚", reading: "いるか", note: "哺乳類・クジラ目。「海の豚」という漢字表記。" },
       { kanji: "鯱", reading: "しゃちほこ", note: "想像上の生物。名古屋城の金のシャチホコが有名。" },
@@ -66,7 +66,7 @@ const CATEGORIES = [
   },
   {
     title: "地名",
-    emoji: "📍",
+    emoji: "",
     items: [
       { kanji: "茨城", reading: "いばらき", note: "関東地方の県。「茨（いばら）」という植物から。" },
       { kanji: "滋賀", reading: "しが", note: "近畿地方の県。琵琶湖を擁する内陸県。" },
@@ -80,7 +80,7 @@ const CATEGORIES = [
   },
   {
     title: "日常語・その他",
-    emoji: "💬",
+    emoji: "",
     items: [
       { kanji: "土産", reading: "みやげ", note: "旅行先などで買う贈り物。「土」の「産物」という意。" },
       { kanji: "雪崩", reading: "なだれ", note: "雪が斜面を崩れ落ちる自然現象。" },
@@ -220,11 +220,11 @@ export default function StudyPage() {
           <h2 className="text-lg font-black mb-4" style={{ color: "#fca5a5" }}>読み仮名スプリントで効果的に練習する方法</h2>
           <div className="space-y-3">
             {[
-              { icon: "⏱️", tip: "毎朝5分、ゲーム感覚で練習する（継続が鍵）" },
-              { icon: "🥋", tip: "段位システムを目標に：初段→三段→名人の順番で上達" },
-              { icon: "📊", tip: "タイムアタックモードで「素早く読む」反射神経を鍛える" },
-              { icon: "📝", tip: "苦手克服リストで弱点の漢字を集中的に復習する" },
-              { icon: "📣", tip: "スコアをXでシェアして友達と競い合う（競争心が学習効果を高める）" },
+              { icon: "️", tip: "毎朝5分、ゲーム感覚で練習する（継続が鍵）" },
+              { icon: "", tip: "段位システムを目標に：初段→三段→名人の順番で上達" },
+              { icon: "", tip: "タイムアタックモードで「素早く読む」反射神経を鍛える" },
+              { icon: "", tip: "苦手克服リストで弱点の漢字を集中的に復習する" },
+              { icon: "", tip: "スコアをXでシェアして友達と競い合う（競争心が学習効果を高める）" },
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 text-sm" style={{ color: "rgba(252,165,165,0.8)" }}>
                 <span>{item.icon}</span>

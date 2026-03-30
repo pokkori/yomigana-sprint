@@ -115,7 +115,7 @@ export default function ReportPage() {
           <div className="rounded-2xl p-4 text-center"
             style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.3)" }}>
             <div className="text-3xl font-black" style={{ color: streak > 0 ? "#fbbf24" : "#78716c" }}>
-              {streak > 0 ? `🔥${streak}` : "0"}
+              {streak > 0 ? `${streak}` : "0"}
             </div>
             <div className="text-xs mt-1" style={{ color: "rgba(252,165,165,0.7)" }}>連続学習日数</div>
           </div>
@@ -162,7 +162,7 @@ export default function ReportPage() {
             </p>
             {weeklyRate >= 100 ? (
               <div className="text-xs font-bold px-2 py-1 rounded-full w-fit" style={{ background: "rgba(34,197,94,0.2)", color: "#86efac", border: "1px solid rgba(34,197,94,0.4)" }}>
-                🎉 週目標達成！
+                 週目標達成！
               </div>
             ) : (
               <p className="text-xs" style={{ color: "rgba(252,165,165,0.5)" }}>
@@ -171,7 +171,7 @@ export default function ReportPage() {
             )}
             {streak >= 7 && (
               <div className="mt-2 text-xs font-bold px-2 py-1 rounded-full w-fit" style={{ background: "rgba(251,191,36,0.2)", color: "#fbbf24", border: "1px solid rgba(251,191,36,0.4)" }}>
-                ⚡ 7日以上連続達成中！
+                 7日以上連続達成中！
               </div>
             )}
           </div>
@@ -218,10 +218,10 @@ export default function ReportPage() {
           <h2 className="text-base font-black mb-4" style={{ color: "#fca5a5" }}>難易度別ベストスコア</h2>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { label: "🟢 かんたん", value: bestScores.easy, unit: "問" },
-              { label: "🟡 ふつう", value: bestScores.normal, unit: "問" },
-              { label: "🔴 むずかしい", value: bestScores.hard, unit: "問" },
-              { label: "⚡ タイムアタック", value: bestScores.ta, unit: "問/60s" },
+              { label: " かんたん", value: bestScores.easy, unit: "問" },
+              { label: " ふつう", value: bestScores.normal, unit: "問" },
+              { label: " むずかしい", value: bestScores.hard, unit: "問" },
+              { label: " タイムアタック", value: bestScores.ta, unit: "問/60s" },
             ].map((item) => (
               <div key={item.label} className="rounded-xl p-3 text-center"
                 style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)" }}>
@@ -241,7 +241,7 @@ export default function ReportPage() {
           <h2 className="text-base font-black mb-4" style={{ color: "#fca5a5" }}>苦手カテゴリ分析</h2>
           {categoryStats.length === 0 ? (
             <div className="text-center py-4">
-              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-3xl mb-2"></div>
               <p className="text-sm font-bold" style={{ color: "#fca5a5" }}>苦手カテゴリなし！</p>
               <p className="text-xs mt-1" style={{ color: "rgba(120,113,108,0.6)" }}>まだプレイ記録がありません</p>
             </div>
@@ -254,7 +254,7 @@ export default function ReportPage() {
                   <div key={cat.level}>
                     <div className="flex justify-between text-xs mb-1">
                       <span className="font-bold" style={{ color: i === 0 ? "#f97316" : "#e7e5e4" }}>
-                        {i === 0 ? "🔴 " : ""}{levelLabels[cat.level] ?? cat.level}
+                        {i === 0 ? " " : ""}{levelLabels[cat.level] ?? cat.level}
                       </span>
                       <span style={{ color: "rgba(252,165,165,0.7)" }}>ミス{cat.count}回</span>
                     </div>
@@ -309,7 +309,7 @@ export default function ReportPage() {
           <Link href="/game"
             className="flex items-center justify-center font-black py-4 rounded-2xl text-lg active:scale-95 transition-transform"
             style={{ background: "linear-gradient(135deg, #dc2626, #991b1b)", color: "#fff" }}>
-            🥋 苦手漢字を復習する →
+             苦手漢字を復習する →
           </Link>
           <Link href="/"
             className="flex items-center justify-center font-black py-3 rounded-2xl text-sm active:scale-95 transition-transform"
@@ -323,12 +323,12 @@ export default function ReportPage() {
           style={{ background: "rgba(220,38,38,0.06)", border: "1px solid rgba(220,38,38,0.15)" }}>
           <h2 className="text-sm font-black mb-3" style={{ color: "#fca5a5" }}>学習アドバイス</h2>
           <div className="space-y-2 text-xs" style={{ color: "rgba(252,165,165,0.75)" }}>
-            {streak >= 7 && <p>🏆 7日以上連続！この調子を続ければ漢字力が着実にアップします。</p>}
-            {streak >= 3 && streak < 7 && <p>🔥 {streak}日連続！あと{7 - streak}日続けると習慣化のゴールです。</p>}
-            {streak < 3 && <p>📅 毎日少しずつ練習すると記憶が定着します。1日10問を目標にしよう！</p>}
-            {weakList.length >= 10 && <p>📖 苦手漢字が{weakList.length}字あります。苦手克服モードで集中的に練習しましょう。</p>}
-            {totalWeek >= 50 && <p>⚡ 今週{totalWeek}問達成！タイムアタックでさらに速読力を鍛えよう。</p>}
-            {totalWeek < 10 && <p>🌱 今週はまだ{totalWeek}問。毎日少しずつ積み上げることが大切です。</p>}
+            {streak >= 7 && <p> 7日以上連続！この調子を続ければ漢字力が着実にアップします。</p>}
+            {streak >= 3 && streak < 7 && <p> {streak}日連続！あと{7 - streak}日続けると習慣化のゴールです。</p>}
+            {streak < 3 && <p> 毎日少しずつ練習すると記憶が定着します。1日10問を目標にしよう！</p>}
+            {weakList.length >= 10 && <p> 苦手漢字が{weakList.length}字あります。苦手克服モードで集中的に練習しましょう。</p>}
+            {totalWeek >= 50 && <p> 今週{totalWeek}問達成！タイムアタックでさらに速読力を鍛えよう。</p>}
+            {totalWeek < 10 && <p> 今週はまだ{totalWeek}問。毎日少しずつ積み上げることが大切です。</p>}
           </div>
         </div>
 

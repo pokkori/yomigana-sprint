@@ -12,7 +12,9 @@
     "@vercel/analytics": "^1.6.1",
     "next": "^15.5.13",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-native-reanimated": "~3.17.4",
+    "react-native-svg": "^15.15.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
