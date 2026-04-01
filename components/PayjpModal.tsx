@@ -39,7 +39,7 @@ export default function PayjpModal({ onClose }: { onClose: () => void }) {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 px-4">
       <div className="bg-white rounded-2xl p-8 max-w-sm w-full relative">
-        <button onClick={onClose} className="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl">×</button>
+        <button onClick={onClose} aria-label="モーダルを閉じる" className="absolute top-3 right-4 text-gray-400 hover:text-gray-600 text-xl">×</button>
         <h2 className="text-xl font-bold mb-1">プレミアムプラン</h2>
         <p className="text-gray-500 text-sm mb-4">¥480/月 — 全3,000問 + JLPT別 + 地名 + 人名</p>
         <form onSubmit={handleSubmit}>

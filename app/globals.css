@@ -3,6 +3,10 @@
 :root {
   --background: #0F0F1A;
   --foreground: #F1F5F9;
+  --bg-primary: #1A1A2E;
+  --color-purple: #7B2FBE;
+  --color-cyan: #00F5FF;
+  --color-gold: #FFD93D;
 }
 
 body {
@@ -60,3 +64,71 @@ body {
 }
 
 .tabular-nums { font-variant-numeric: tabular-nums; }
+
+/* ============================================
+   デザイン改修 2026 — 追加アニメーション & ユーティリティ
+   ============================================ */
+
+/* orbFloat は OrbBackground.tsx 内の <style> に定義済み */
+
+@keyframes correctBounce {
+  0%   { transform: scale(0.8) translateY(0); opacity: 0; }
+  40%  { transform: scale(1.2) translateY(-12px); opacity: 1; }
+  70%  { transform: scale(0.95) translateY(4px); opacity: 1; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+@keyframes screenShake {
+  0%,100% { transform: translateX(0); }
+  15%     { transform: translateX(-8px); }
+  30%     { transform: translateX(8px); }
+  45%     { transform: translateX(-6px); }
+  60%     { transform: translateX(6px); }
+  75%     { transform: translateX(-3px); }
+  90%     { transform: translateX(3px); }
+}
+
+@keyframes wrongFlash {
+  0%   { background: rgba(220, 38, 38, 0.35); }
+  100% { background: transparent; }
+}
+
+@keyframes correctKanji {
+  0%   { filter: drop-shadow(0 0 0px #FFD93D); }
+  50%  { filter: drop-shadow(0 0 16px #FFD93D) drop-shadow(0 0 32px #00F5FF); }
+  100% { filter: drop-shadow(0 0 4px #FFD93D); }
+}
+
+@keyframes btnPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(123,47,190,0.5), 0 4px 20px rgba(0,0,0,0.4); }
+  50%       { box-shadow: 0 0 0 10px rgba(123,47,190,0), 0 4px 24px rgba(0,0,0,0.5); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.06); }
+}
+
+.animate-shake {
+  animation: screenShake 0.4s ease-in-out;
+}
+
+.animate-correct-bounce {
+  animation: correctBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-wrong-flash {
+  animation: wrongFlash 0.4s ease-out forwards;
+}
+
+.animate-kanji-glow {
+  animation: correctKanji 0.6s ease-in-out;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+}

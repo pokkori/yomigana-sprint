@@ -2,6 +2,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect, useCallback } from "react";
+import OrbBackground from "@/components/OrbBackground";
+import MascotSprite from "@/components/MascotSprite";
 
 //  Streak管理 
 const STREAK_KEY = "yomigana_daily_streak";
@@ -496,72 +498,77 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden" style={{
-      background: 'radial-gradient(ellipse at 20% 30%, rgba(220,38,38,0.06) 0%, transparent 50%), radial-gradient(ellipse at 80% 70%, rgba(251,191,36,0.04) 0%, transparent 50%), linear-gradient(160deg, #1c1917, #292524, #1c1917)',
+      background: 'linear-gradient(135deg, #1A1A2E 0%, #16213e 50%, #0f3460 100%)',
     }}>
-      {/* Floating particles */}
-      <style>{`
-        @keyframes brushFloat {
-          0% { transform: translateY(0) rotate(0deg); opacity: 0.3; }
-          50% { transform: translateY(-35px) rotate(10deg); opacity: 0.6; }
-          100% { transform: translateY(-70px) rotate(-5deg); opacity: 0; }
-        }
-      `}</style>
-      {[12, 30, 48, 65, 82].map((left, i) => (
-        <div key={i} className="fixed pointer-events-none z-0" style={{
-          left: `${left}%`, bottom: '5%',
-          width: 4 + i % 3 * 2, height: 4 + i % 3 * 2,
-          borderRadius: '50%',
-          background: `radial-gradient(circle, ${['#DC2626', '#FBBF24', '#DC2626', '#FBBF24', '#DC2626'][i]}, transparent)`,
-          animation: `brushFloat ${4 + i}s ease-in-out ${i * 0.6}s infinite`,
-          boxShadow: `0 0 6px ${['rgba(220,38,38,0.4)', 'rgba(251,191,36,0.4)'][i % 2]}`,
-        }} />
-      ))}
-      {/* ヒーロー -- 道場テーマ */}
+      {/* OrbBackground: 12個の光球浮遊背景 */}
+      <OrbBackground />
+      {/* ヒーロー -- 道場テーマ（#1A1A2E ベース） */}
       <section className="relative text-white py-20 px-4 text-center overflow-hidden"
-        style={{ background: "linear-gradient(180deg, #44403c 0%, #292524 100%)", borderBottom: "2px solid rgba(220,38,38,0.4)" }}>
-        {/* 背景装飾 */}
+        style={{
+          background: "linear-gradient(180deg, rgba(26,26,46,0.95) 0%, rgba(22,33,62,0.98) 100%)",
+          borderBottom: "1px solid rgba(123,47,190,0.3)",
+        }}>
+        {/* グリッド背景装飾 */}
         <div className="absolute inset-0 pointer-events-none" style={{
-          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(220,38,38,0.05) 48px, rgba(220,38,38,0.05) 50px)",
+          backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 48px, rgba(123,47,190,0.04) 48px, rgba(123,47,190,0.04) 50px)",
         }} />
         <div className="relative z-10">
+          {/* よみまるマスコット SVG（絵文字代替） */}
           <div className="flex justify-center mb-4">
-            <Image src="/mascot.png" alt="道場マスコット" width={88} height={88} className="rounded-full shadow-2xl"
-              style={{ border: "3px solid rgba(220,38,38,0.6)", boxShadow: "0 0 30px rgba(220,38,38,0.4)" }} />
+            <div style={{
+              filter: "drop-shadow(0 0 24px rgba(123,47,190,0.6))",
+              border: "3px solid rgba(123,47,190,0.5)",
+              borderRadius: "50%",
+              padding: 4,
+              background: "rgba(45,27,105,0.4)",
+            }}>
+              <MascotSprite pose="idle" size={88} />
+            </div>
           </div>
           <span className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest mb-4"
-            style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}>
+            style={{ background: "rgba(123,47,190,0.25)", color: "#c084fc", border: "1px solid rgba(123,47,190,0.5)" }}>
             難読漢字 道場
           </span>
           <h1 className="text-4xl md:text-5xl font-black mb-4 leading-tight" style={{
-            background: 'linear-gradient(135deg, #FFF 0%, #FCA5A5 40%, #DC2626 100%)',
+            background: 'linear-gradient(135deg, #FFFFFF 0%, #E2DCFF 40%, #00F5FF 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            filter: 'drop-shadow(0 0 20px rgba(220,38,38,0.5))',
+            filter: 'drop-shadow(0 0 20px rgba(0,245,255,0.4))',
           }}>
             読み仮名スプリント
           </h1>
-          <p className="text-lg md:text-xl mb-2 font-bold" style={{ color: "#fca5a5" }}>茨城・薔薇・山葵…読める？</p>
-          <p className="text-sm mb-3" style={{ color: "rgba(252,165,165,0.65)" }}>難読漢字・地名・人名 全3,000問以上</p>
-          <p className="text-sm font-bold mb-5" style={{ color: "#fbbf24" }}>
-             連続正解で段位が上がる！名人を目指せ
+          <p className="text-lg md:text-xl mb-2 font-bold" style={{ color: "#c084fc" }}>茨城・薔薇・山葵…読める？</p>
+          <p className="text-sm mb-3" style={{ color: "rgba(192,132,252,0.65)" }}>難読漢字・地名・人名 全3,000問以上</p>
+          <p className="text-sm font-bold mb-5" style={{ color: "#FFD93D" }}>
+            連続正解で段位が上がる！名人を目指せ
           </p>
           {/* 社会的証明バッジ */}
           <div className="flex flex-wrap justify-center gap-2 mb-7">
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}> 累計10,000回以上プレイ</span>
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}> 満足度 4.7/5.0</span>
-            <span className="text-xs font-bold px-3 py-1.5 rounded-full" style={{ background: "rgba(220,38,38,0.25)", color: "#fca5a5", border: "1px solid rgba(220,38,38,0.5)" }}> スマホ完全対応</span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full glass-card"
+              style={{ background: "rgba(123,47,190,0.2)", color: "#c084fc", border: "1px solid rgba(123,47,190,0.4)" }}>
+              累計10,000回以上プレイ
+            </span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full glass-card"
+              style={{ background: "rgba(0,245,255,0.1)", color: "#00F5FF", border: "1px solid rgba(0,245,255,0.3)" }}>
+              満足度 4.7/5.0
+            </span>
+            <span className="text-xs font-bold px-3 py-1.5 rounded-full glass-card"
+              style={{ background: "rgba(255,217,61,0.1)", color: "#FFD93D", border: "1px solid rgba(255,217,61,0.35)" }}>
+              スマホ完全対応
+            </span>
           </div>
           <Link href="/game"
             aria-label="読み仮名スプリント道場に入門する（無料）"
             className="inline-block font-black text-xl px-12 py-4 rounded-2xl transition-all duration-200 hover:-translate-y-1 active:scale-[0.95] min-h-[56px]"
             style={{
-              background: "linear-gradient(135deg, #dc2626 0%, #991b1b 50%, #7F1D1D 100%)",
+              background: "linear-gradient(135deg, #7B2FBE 0%, #DC2626 50%, #FFD93D 100%)",
               color: "#fff",
-              boxShadow: "0 0 40px rgba(220,38,38,0.5), 0 8px 24px rgba(0,0,0,0.4)",
+              boxShadow: "0 0 40px rgba(123,47,190,0.5), 0 8px 24px rgba(0,0,0,0.4)",
+              animation: "btnPulse 2.5s ease-in-out infinite",
             }}>
             道場に入門する（無料）
           </Link>
-          <p className="text-xs mt-4" style={{ color: "rgba(252,165,165,0.45)" }}>登録不要・クレジットカード不要</p>
+          <p className="text-xs mt-4" style={{ color: "rgba(192,132,252,0.45)" }}>登録不要・クレジットカード不要</p>
         </div>
       </section>
 
@@ -862,22 +869,22 @@ export default function HomePage() {
       {/* グローバルランキング風（固定表示） */}
       <section className="py-10 px-4" style={{ background: "rgba(0,0,0,0.2)" }}>
         <div className="max-w-lg mx-auto">
-          <h2 className="text-center text-lg font-black mb-5" style={{ color: "#fca5a5" }}> ベストプレイヤー（参考例）</h2>
+          <h2 className="text-center text-lg font-black mb-5" style={{ color: "#c084fc" }}>ベストプレイヤー（参考例）</h2>
           <div className="space-y-2">
             {[
-              { rank: 1, name: "漢字博士", score: "タイムアタック 31問", badge: " 名人", color: "#fbbf24" },
-              { rank: 2, name: "難読マスター", score: "通常モード 全問正解", badge: "️ 五段", color: "#f97316" },
-              { rank: 3, name: "漢字スプリンター", score: "タイムアタック 28問", badge: "️ 三段", color: "#ef4444" },
-              { rank: 4, name: "文字の達人", score: "通常モード 9/10問", badge: " 初段", color: "#a78bfa" },
+              { rank: 1, name: "漢字博士", score: "タイムアタック 31問", badge: "名人", color: "#fbbf24" },
+              { rank: 2, name: "難読マスター", score: "通常モード 全問正解", badge: "五段", color: "#f97316" },
+              { rank: 3, name: "漢字スプリンター", score: "タイムアタック 28問", badge: "三段", color: "#ef4444" },
+              { rank: 4, name: "文字の達人", score: "通常モード 9/10問", badge: "初段", color: "#a78bfa" },
             ].map((player) => (
-              <div key={player.rank} className="flex items-center gap-3 rounded-xl px-4 py-3"
-                style={{ background: "rgba(68,64,60,0.4)", border: `1px solid rgba(${player.rank === 1 ? "251,191,36" : "120,113,108"},0.3)` }}>
-                <div className="text-lg font-black w-6 text-center" style={{ color: player.rank <= 3 ? player.color : "#78716c" }}>
-                  {player.rank <= 3 ? ["","",""][player.rank - 1] : player.rank}
+              <div key={player.rank} className="glass-card flex items-center gap-3 rounded-xl px-4 py-3"
+                style={{ background: "rgba(255,255,255,0.04)", border: `1px solid rgba(${player.rank === 1 ? "255,217,61" : "255,255,255"},0.1)` }}>
+                <div className="text-lg font-black w-6 text-center tabular-nums" style={{ color: player.rank <= 3 ? player.color : "#78716c" }}>
+                  {player.rank}
                 </div>
                 <div className="flex-1">
-                  <div className="text-sm font-bold" style={{ color: "#e7e5e4" }}>{player.name}</div>
-                  <div className="text-xs" style={{ color: "rgba(120,113,108,0.7)" }}>{player.score}</div>
+                  <div className="text-sm font-bold" style={{ color: "#E2DCFF" }}>{player.name}</div>
+                  <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>{player.score}</div>
                 </div>
                 <div className="text-xs font-bold px-2 py-1 rounded-full"
                   style={{ background: player.color + "22", color: player.color, border: `1px solid ${player.color}44` }}>
@@ -939,7 +946,7 @@ export default function HomePage() {
           style={{ background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.2)" }}>
           <p className="font-bold mb-1 text-sm" style={{ color: "#fca5a5" }}>投稿イメージ</p>
           <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.7)" }}>
-            「【読み仮名スプリント】10問中8問正解！段位: 三段️<br />
+            「【読み仮名スプリント】10問中8問正解！段位: 三段<br />
             薔薇・茨城・山葵…全部読める？<br />
             → yomigana-sprint.vercel.app #難読漢字 #漢字クイズ」
           </p>
@@ -974,21 +981,25 @@ export default function HomePage() {
           <p className="text-center text-xs mb-6" style={{ color: "rgba(252,165,165,0.5)" }}>全国のプレイヤーからの声</p>
           <div className="space-y-4">
             {[
-              { name: "田中さん（30代・会社員）", badge: " 名人", text: "薔薇・山葵・蒲公英… 初めてプレイしたとき10問中3問しか読めなかったのに、1週間でほぼ全問正解できるようになりました！ゲームみたいで楽しくて毎朝の習慣になっています。" },
-              { name: "山田さん（高校2年生）", badge: "️ 五段", text: "国語の先生に「茨城の読み方を知らないの？」と言われてショックでした。このアプリで練習したら授業で一番になれた！毎日の5分が変わります。" },
-              { name: "鈴木さん（40代・主婦）", badge: "️ 三段", text: "小学生の子どもと一緒に楽しんでいます。私のほうが間違えることも多くて大笑い。家族で「今日の難読漢字」を出し合うのが日課になりました。" },
-              { name: "伊藤さん（50代・教師）", badge: " 初段", text: "JLPT N1を目指している外国人学生にも勧めています。段位システムがモチベーションを保つのにとても役立ちます。問題の質が高くて安心して使えます。" },
+              { name: "田中さん（30代・会社員）", badge: "名人", text: "薔薇・山葵・蒲公英… 初めてプレイしたとき10問中3問しか読めなかったのに、1週間でほぼ全問正解できるようになりました！ゲームみたいで楽しくて毎朝の習慣になっています。" },
+              { name: "山田さん（高校2年生）", badge: "五段", text: "国語の先生に「茨城の読み方を知らないの？」と言われてショックでした。このアプリで練習したら授業で一番になれた！毎日の5分が変わります。" },
+              { name: "鈴木さん（40代・主婦）", badge: "三段", text: "小学生の子どもと一緒に楽しんでいます。私のほうが間違えることも多くて大笑い。家族で「今日の難読漢字」を出し合うのが日課になりました。" },
+              { name: "伊藤さん（50代・教師）", badge: "初段", text: "JLPT N1を目指している外国人学生にも勧めています。段位システムがモチベーションを保つのにとても役立ちます。問題の質が高くて安心して使えます。" },
             ].map((review, i) => (
-              <div key={i} className="rounded-2xl p-4"
-                style={{ background: "rgba(68,64,60,0.4)", border: "1px solid rgba(220,38,38,0.2)" }}>
+              <div key={i} className="glass-card rounded-2xl p-4"
+                style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(123,47,190,0.15)" }}>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-bold" style={{ color: "#e7e5e4" }}>{review.name}</span>
-                  <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: "rgba(220,38,38,0.2)", color: "#fca5a5" }}>{review.badge}</span>
+                  <span className="text-sm font-bold" style={{ color: "#E2DCFF" }}>{review.name}</span>
+                  <span className="text-xs font-bold px-2 py-1 rounded-full" style={{ background: "rgba(123,47,190,0.2)", color: "#c084fc" }}>{review.badge}</span>
                 </div>
-                <div className="flex mb-2">
-                  {[1,2,3,4,5].map(s => <span key={s} style={{ color: "#fbbf24", fontSize: "12px" }}></span>)}
+                <div className="flex gap-0.5 mb-2">
+                  {[1,2,3,4,5].map(s => (
+                    <svg key={s} viewBox="0 0 12 12" width={12} height={12}>
+                      <polygon points="6,1 7.5,4.5 11,5 8.5,7.5 9,11 6,9.5 3,11 3.5,7.5 1,5 4.5,4.5" fill="#FFD93D" />
+                    </svg>
+                  ))}
                 </div>
-                <p className="text-xs leading-relaxed" style={{ color: "rgba(252,165,165,0.75)" }}>{review.text}</p>
+                <p className="text-xs leading-relaxed" style={{ color: "rgba(226,220,255,0.7)" }}>{review.text}</p>
               </div>
             ))}
           </div>
@@ -1034,12 +1045,12 @@ export default function HomePage() {
               </thead>
               <tbody>
                 {[
-                  { feature: "難読漢字特化", us: " 3,000問", a: " 漢字薄い", b: "️ 少ない" },
-                  { feature: "ゲーム感覚", us: " 段位制", a: " あり", b: " なし" },
-                  { feature: "即プレイ可能", us: " 登録不要", a: " 登録必須", b: " すぐ使える" },
-                  { feature: "JLPT対応", us: " N5〜N1", a: "️ 一部", b: "️ 一部" },
-                  { feature: "スマホ無料", us: " 毎日10問", a: "️ 広告多い", b: " 有料のみ" },
-                  { feature: "地名・人名漢字", us: " 豊富", a: " ほぼなし", b: "️ 少ない" },
+                  { feature: "難読漢字特化", us: "3,000問", a: "漢字薄い", b: "少ない" },
+                  { feature: "ゲーム感覚", us: "段位制", a: "あり", b: "なし" },
+                  { feature: "即プレイ可能", us: "登録不要", a: "登録必須", b: "すぐ使える" },
+                  { feature: "JLPT対応", us: "N5〜N1", a: "一部", b: "一部" },
+                  { feature: "スマホ無料", us: "毎日10問", a: "広告多い", b: "有料のみ" },
+                  { feature: "地名・人名漢字", us: "豊富", a: "ほぼなし", b: "少ない" },
                 ].map((row, i) => (
                   <tr key={i} style={{ background: i % 2 === 0 ? "rgba(68,64,60,0.4)" : "rgba(68,64,60,0.2)", borderBottom: "1px solid rgba(220,38,38,0.1)" }}>
                     <td className="px-3 py-2.5 font-bold" style={{ color: "#e7e5e4" }}>{row.feature}</td>
