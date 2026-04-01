@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
 import KomojuButton from "./KomojuButton";
@@ -436,7 +436,8 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   }, [gameMode, phase === "mode_select", timeLeft === TIME_ATTACK_SECONDS]); // eslint-disable-line
 
   const current = questions[idx];
-  const shuffledChoices = useState(() => shuffle(current?.choices ?? []))[0];
+  // idxが変わるたびにシャッフルし直す（useMemoで問題ごとに固定）
+  const shuffledChoices = useMemo(() => shuffle(current?.choices ?? []), [idx]); // eslint-disable-line
 
   const handleAnswer = useCallback((choice: string) => {
     if (phase !== "playing" && phase !== "answered") return;
