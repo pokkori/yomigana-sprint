@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Sans_JP } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import OrbBackground from "@/components/OrbBackground";
 import "./globals.css";
 
 const notoSansJP = Noto_Sans_JP({ subsets: ["latin"], weight: ["400", "700"], display: "swap" });
@@ -66,6 +67,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       </head>
       <body className={`${notoSansJP.className} bg-[#0F0F1A] text-slate-100 antialiased`}>
+        <OrbBackground />
         {children}
         <Analytics />
       </body>
