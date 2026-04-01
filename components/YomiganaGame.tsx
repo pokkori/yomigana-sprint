@@ -7,6 +7,7 @@ import MascotSprite from "./MascotSprite";
 import CorrectBurst from "./CorrectBurst";
 import { useBGM } from "@/hooks/useBGM";
 import { useSE } from "@/hooks/useSE";
+import { ScorePopLayer, type ScorePopItem } from "./ScorePop";
 
 //  Web Speech API 
 function speakReading(text: string) {
@@ -364,6 +365,9 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [shakeActive, setShakeActive] = useState(false);
   const [burstActive, setBurstActive] = useState(false);
   const [wrongOverlay, setWrongOverlay] = useState(false);
+  // ScorePop
+  const [scorePopItems, setScorePopItems] = useState<ScorePopItem[]>([]);
+  const scorePopIdRef = useRef(0);
   // BGM / SE
   const [bgmMuted, setBgmMuted] = useState(false);
   const bgm = useBGM();
@@ -452,8 +456,21 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
     }
     if (correct) {
       const newStreak = streak + 1;
-      setScore(s => s + 100 + streak * 10);
+      const pts = 100 + streak * 10;
+      setScore(s => s + pts);
       setStreak(newStreak);
+      // ScorePop発火
+      const popId = ++scorePopIdRef.current;
+      setScorePopItems(prev => [
+        ...prev,
+        {
+          id: popId,
+          value: pts,
+          combo: newStreak,
+          x: window.innerWidth / 2,
+          y: window.innerHeight * 0.4,
+        },
+      ]);
       if (gameMode === "timeattack") setTaCorrect(c => c + 1);
       if (newStreak >= 3) {
         // コンボSE（正解SEより優先して発火）
@@ -1041,6 +1058,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       className={`min-h-screen px-4 py-8 relative ${shakeActive ? "animate-shake" : ""}`}
       style={{ background: "linear-gradient(135deg, #1A1A2E 0%, #16213e 50%, #0f3460 100%)" }}
     >
+      {/* ScorePopLayer: fixed overlay */}
+      <ScorePopLayer
+        items={scorePopItems}
+        onRemove={id => setScorePopItems(prev => prev.filter(p => p.id !== id))}
+      />
+
       {/* 不正解赤フラッシュオーバーレイ */}
       {wrongOverlay && (
         <div
