@@ -4,6 +4,7 @@ import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
 import KomojuButton from "./KomojuButton";
 import MascotSprite from "./MascotSprite";
+import CharacterAvatar, { type Emotion as AvatarEmotion } from "./CharacterAvatar";
 import CorrectBurst from "./CorrectBurst";
 import { useBGM } from "@/hooks/useBGM";
 import { useSE } from "@/hooks/useSE";
@@ -1178,6 +1179,19 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             <div className="h-2 rounded-full transition-all"
               style={{ width: `${((idx) / questions.length) * 100}%`, background: "linear-gradient(90deg, #7B2FBE, #00F5FF)" }} />
           )}
+        </div>
+
+        {/* CharacterAvatar: 正解/不正解/時間警告に応じた感情表示 */}
+        <div className="flex justify-center mb-3">
+          <CharacterAvatar
+            emotion={((): AvatarEmotion => {
+              if (gameMode === "timeattack" && timeLeft <= 10 && timeLeft > 0) return "surprised";
+              if (isCorrect === true) return "happy";
+              if (isCorrect === false) return "sad";
+              return "normal";
+            })()}
+            size={72}
+          />
         </div>
 
         {/* 問題カード（glass-card） */}
