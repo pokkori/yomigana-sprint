@@ -8,6 +8,8 @@ import CorrectBurst from "./CorrectBurst";
 import { useBGM } from "@/hooks/useBGM";
 import { useSE } from "@/hooks/useSE";
 import { ScorePopLayer, type ScorePopItem } from "./ScorePop";
+import { LottiePlayer } from "./LottiePlayer";
+import { StreakFlame } from "./StreakFlame";
 
 //  Web Speech API 
 function speakReading(text: string) {
@@ -365,6 +367,9 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
   const [shakeActive, setShakeActive] = useState(false);
   const [burstActive, setBurstActive] = useState(false);
   const [wrongOverlay, setWrongOverlay] = useState(false);
+  // Lottieキャラ感情反応
+  type LottieState = 'idle' | 'happy' | 'sad' | 'fever';
+  const [lottieState, setLottieState] = useState<LottieState>('idle');
   // ScorePop
   const [scorePopItems, setScorePopItems] = useState<ScorePopItem[]>([]);
   const scorePopIdRef = useRef(0);
@@ -487,6 +492,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       setMascotPose(newStreak >= 3 ? "excited" : "correct");
       setBurstActive(true);
       setTimeout(() => { setBurstActive(false); setMascotPose("idle"); }, 900);
+      // Lottieキャラ感情反応: コンボ10以上→fever、それ以外→happy
+      if (newStreak >= 10) {
+        setLottieState('fever');
+      } else {
+        setLottieState('happy');
+      }
     } else {
       // 不正解SE
       se.playWrong();
@@ -502,6 +513,8 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       setWeakList(getWeakList());
       // デザイン改修: 不正解演出
       setMascotPose("wrong");
+      // Lottieキャラ感情反応: 不正解→sad
+      setLottieState('sad');
       setShakeActive(true);
       setWrongOverlay(true);
       setTimeout(() => { setShakeActive(false); setWrongOverlay(false); setMascotPose("idle"); }, 500);
@@ -1064,6 +1077,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         onRemove={id => setScorePopItems(prev => prev.filter(p => p.id !== id))}
       />
 
+      {/* Lottieキャラ感情反応アニメーション */}
+      <LottiePlayer
+        state={lottieState}
+        onComplete={() => setLottieState('idle')}
+      />
+
       {/* 不正解赤フラッシュオーバーレイ */}
       {wrongOverlay && (
         <div
@@ -1122,14 +1141,14 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         ) : (
           <div className="flex justify-between items-center mb-4">
             <span className="text-sm" style={{ color: "rgba(255,255,255,0.4)" }}>問題 {idx + 1} / {questions.length}</span>
-            <span className="font-black text-lg tabular-nums" style={{ color: "#FFD93D" }}>{score}点</span>
+            <span className="font-black text-lg tabular-nums" style={{ color: "var(--xp-yellow)", textShadow: "0 0 12px rgba(255,217,61,0.6)" }}>{score}点</span>
             {streak >= 3 ? (
               <span className="text-sm font-black px-3 py-1 rounded-full glass-card"
                 style={{
-                  background: "rgba(255,217,61,0.15)",
-                  color: "#FFD93D",
-                  border: "1px solid rgba(255,217,61,0.4)",
-                  boxShadow: "0 0 12px rgba(255,217,61,0.3)",
+                  background: "rgba(255,150,0,0.15)",
+                  color: "var(--streak-orange)",
+                  border: "1px solid rgba(255,150,0,0.5)",
+                  boxShadow: "0 0 12px rgba(255,150,0,0.4)",
                 }}>
                 {streak}連続
               </span>
@@ -1139,11 +1158,12 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
           </div>
         )}
 
-        {/* ログインストリーク表示 */}
-        {loginStreak >= 2 && (
+        {/* ログインストリーク表示 + StreakFlame */}
+        {loginStreak >= 1 && (
           <div className="flex items-center justify-center gap-2 mb-3">
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-full glass-card"
               style={{ background: "rgba(123,47,190,0.15)", border: "1px solid rgba(123,47,190,0.35)" }}>
+              <StreakFlame streak={loginStreak} />
               <span className="text-sm font-bold" style={{ color: "#c084fc" }}>{loginStreak}日連続道場</span>
             </div>
           </div>
@@ -1196,17 +1216,17 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
             if (phase === "answered") {
               if (choice === current.correct) {
                 extraStyle = {
-                  background: "rgba(34,197,94,0.18)",
-                  border: "2px solid rgba(34,197,94,0.8)",
-                  color: "#86efac",
-                  boxShadow: "0 0 16px rgba(34,197,94,0.4)",
+                  background: "rgba(88,204,2,0.18)",
+                  border: "2px solid var(--correct-green)",
+                  color: "#a3f07a",
+                  boxShadow: "0 0 20px rgba(88,204,2,0.5), 0 0 40px rgba(88,204,2,0.2)",
                 };
               } else if (choice === selected) {
                 extraStyle = {
-                  background: "rgba(220,38,38,0.18)",
-                  border: "2px solid rgba(220,38,38,0.8)",
-                  color: "#fca5a5",
-                  boxShadow: "0 0 16px rgba(220,38,38,0.35)",
+                  background: "rgba(255,75,75,0.18)",
+                  border: "2px solid var(--incorrect-red)",
+                  color: "#ffb3b3",
+                  boxShadow: "0 0 16px rgba(255,75,75,0.4)",
                 };
               } else {
                 extraStyle = {
