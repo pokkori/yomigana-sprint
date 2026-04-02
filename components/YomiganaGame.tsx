@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import { haptics } from "@/utils/haptics";
 import { freeQuestions, type Question } from "@/lib/questions-free";
 import { premiumQuestions } from "@/lib/questions-premium";
 import KomojuButton from "./KomojuButton";
@@ -461,6 +462,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       setQuestionResults(prev => [...prev, correct]);
     }
     if (correct) {
+      haptics.success();
       const newStreak = streak + 1;
       const pts = 100 + streak * 10;
       setScore(s => s + pts);
@@ -479,6 +481,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
       ]);
       if (gameMode === "timeattack") setTaCorrect(c => c + 1);
       if (newStreak >= 3) {
+        haptics.combo();
         // コンボSE（正解SEより優先して発火）
         se.playCombo(newStreak);
         setShowStreakBanner(true);
@@ -500,6 +503,7 @@ export default function YomiganaGame({ isPremium }: { isPremium: boolean }) {
         setLottieState('happy');
       }
     } else {
+      haptics.error();
       // 不正解SE
       se.playWrong();
       // 不正解時も正解読み上げ
