@@ -1,34 +1,27 @@
 # 読み仮名スプリント
+> 読み仮名を素早く入力するスピードゲーム
 
 ## サービス概要
-難読漢字・地名・人名の読み方を楽しく学べるクイズゲームWebアプリです。ゲーム感覚で漢字の読み仮名をマスターできます。
+- **カテゴリ**: Webアプリ
+- **URL**: https://yomigana-sprint.vercel.app
+- **提供形態**: Webブラウザで利用可能（登録不要で試せます）
+- **開発**: Claude Code + Next.js 16 + Vercel
 
-## 提供元
-ポッコリラボ（https://yomigana-sprint.vercel.app）
+## 主要ページ
+- [トップページ](https://yomigana-sprint.vercel.app/): メイン機能・サービス説明
+- [ツール](https://yomigana-sprint.vercel.app/tool): AI機能の利用画面（一部サービス）
+- [プライバシーポリシー](https://yomigana-sprint.vercel.app/privacy): 個人情報の取り扱い
+- [特定商取引法に基づく表記](https://yomigana-sprint.vercel.app/legal): 法的情報
 
-## 主な機能
-- 全3,000問以上の難読漢字・地名・人名クイズ
-- 毎日10問無料でプレイ可能
-- JLPT N5〜N1レベル対応の漢字学習
-- 段位認定システム（入門〜師範）
-- タイムアタックモード
-- 苦手漢字の自動記録・復習機能
-- 学習レポート（過去7日間の学習記録）
-- プレミアムプラン（480円/月）で全問無制限
-
-## 収録範囲
-茨城・岐阜・愛媛など全国都道府県名、薔薇・山葵・土産・雪崩など難読漢字、JLPT N1〜N5範囲の常用漢字2,136字
-
-## 対象ユーザー
-日本国内の漢字学習者、JLPT受験者、社会人、小学生〜大人まで楽しめます
-
-## 利用規約・プライバシーポリシー
-- 利用規約: https://yomigana-sprint.vercel.app/terms
-- プライバシーポリシー: https://yomigana-sprint.vercel.app/privacy
-- 特定商取引法に基づく表記: https://yomigana-sprint.vercel.app/legal
+## 利用シーン
+読み仮名を素早く入力するスピードゲーム
 
 ## 技術スタック
-Next.js 15 / TypeScript / Vercel / Noto Sans JP
+- フロントエンド: Next.js 16, React 19, TypeScript, Tailwind CSS
+- AI: Claude claude-sonnet-4-6 (Anthropic)
+- バックエンド: Vercel Edge Functions, Supabase
+- 決済: KOMOJU（クレジットカード・コンビニ払い対応）
 
-## 更新日
-2026-04-01
+## robots.txt
+AIクローラーによるインデックスを歓迎します。
+GPTBot, ClaudeBot, PerplexityBot, Googlebot-Extended のアクセスを許可しています。
